@@ -3,7 +3,7 @@
  */
 
 import { MainSimulation } from './simulation/mainSimulation.js';
-import { defaultScene } from './config/sceneConfig.js';
+import { defaultScene } from './config/scenesConfig.js';
 import { generalConfig } from './config/generalConfig.js';
 
 // Create and initialize the simulation
