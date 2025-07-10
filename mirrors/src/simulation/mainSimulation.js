@@ -3,8 +3,8 @@
  * Main exports: MainSimulation
  */
 
-import { Polygon } from '../entities/real/Polygon.js';
-import { Mirror } from '../entities/real/Mirror.js';
+import { Polygon } from '../basicEntities/real/Polygon.js';
+import { Mirror } from '../basicEntities/real/Mirror.js';
 
 /**
  * @class MainSimulation
