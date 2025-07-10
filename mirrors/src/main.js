@@ -15,7 +15,8 @@ import { generalConfig } from './config/generalConfig.js';
 
 const simulation = new MainSimulation2({
     sceneEntities: sceneEntities,
-    svgCanvas: document.getElementById('mirror-canvas')
+    svgCanvas: document.getElementById('mirror-canvas'),
+    generalConfig: generalConfig
 });
 
 simulation.init();

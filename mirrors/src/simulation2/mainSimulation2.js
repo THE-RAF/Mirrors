@@ -14,9 +14,11 @@ export class MainSimulation2 {
      * @param {Object} config
      * @param {Object} config.sceneEntities - Scene configuration containing objects
      * @param {SVGElement} config.svgCanvas - SVG element for rendering
+     * @param {Object} config.generalConfig - General application configuration
      */
-    constructor({ sceneEntities, svgCanvas }) {
+    constructor({ sceneEntities, generalConfig, svgCanvas }) {
         this.objectConfigs = sceneEntities.objects || [];
+        this.generalConfig = generalConfig;
         this.svgCanvas = svgCanvas;
         this.polygons = [];
     }
@@ -39,7 +41,8 @@ export class MainSimulation2 {
                 fill: objConfig.fill,
                 stroke: objConfig.stroke,
                 strokeWidth: objConfig.strokeWidth,
-                parentSvg: this.svgCanvas
+                parentSvg: this.svgCanvas,
+                draggable: this.generalConfig.interaction.draggablePolygons
             });
             
             return polygon;
