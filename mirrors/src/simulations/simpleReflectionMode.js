@@ -5,8 +5,7 @@
 
 import { Polygon } from '../basicEntities/real/Polygon.js';
 import { Mirror } from '../basicEntities/real/Mirror.js';
-import { VirtualPolygon } from '../basicEntities/virtual/VirtualPolygon.js';
-import { reflectPolygonOverAxis } from '../math/reflections.js';
+import { ReflectionEngine } from '../engines/ReflectionEngine.js';
 
 /**
  * @class SimpleReflectionMode
@@ -26,7 +25,9 @@ export class SimpleReflectionMode {
         this.svgCanvas = svgCanvas;
         this.polygons = [];
         this.mirrors = [];
-        this.virtualPolygons = [];
+        
+        // Initialize reflection engine
+        this.reflectionEngine = new ReflectionEngine({ svgCanvas });
     }
     
     /**
@@ -35,7 +36,8 @@ export class SimpleReflectionMode {
     init() {
         this.createPolygons();
         this.createMirrors();
-        this.createReflections();
+        this.reflectionEngine.createReflections(this.polygons, this.mirrors);
+        this.setupReflectionUpdates();
     }
 
     /**
@@ -52,9 +54,6 @@ export class SimpleReflectionMode {
             
             return polygon;
         });
-        
-        // Set up global drag listener for reflection updates
-        this.setupReflectionUpdates();
     }
 
     /**
@@ -64,7 +63,7 @@ export class SimpleReflectionMode {
         document.addEventListener('mousemove', () => {
             // Check if any real scene element is being dragged
             if (this.isSceneBeingDragged()) {
-                this.updateReflections();
+                this.reflectionEngine.updateReflections(this.polygons, this.mirrors);
             }
         });
     }
@@ -100,50 +99,6 @@ export class SimpleReflectionMode {
     }
 
     /**
-     * Create reflections of all polygons across all mirrors
-     */
-    createReflections() {
-        this.polygons.forEach(polygon => {
-            this.mirrors.forEach(mirror => {
-                // Define mirror axis from mirror coordinates
-                const axis = {
-                    x1: mirror.x1,
-                    y1: mirror.y1,
-                    x2: mirror.x2,
-                    y2: mirror.y2
-                };
-                
-                // Reflect polygon vertices
-                const reflectedVertices = reflectPolygonOverAxis({
-                    polygon: polygon.vertices,
-                    axis: axis
-                });
-                
-                // Create virtual polygon for the reflection
-                const virtualPolygon = new VirtualPolygon({
-                    vertices: reflectedVertices,
-                    fill: polygon.fill,
-                    parentSvg: this.svgCanvas
-                });
-                
-                this.virtualPolygons.push(virtualPolygon);
-            });
-        });
-    }
-
-    /**
-     * Update all reflections based on current polygon positions
-     */
-    updateReflections() {
-        // Clear existing reflections
-        this.virtualPolygons.forEach(virtualPolygon => virtualPolygon.destroy());
-        this.virtualPolygons = [];
-        
-        // Recreate reflections with current positions
-        this.createReflections();
-    }
-
-    /**
      * Clean up all simulation resources
      */
     destroy() {
@@ -155,8 +110,7 @@ export class SimpleReflectionMode {
         this.mirrors.forEach(mirror => mirror.destroy());
         this.mirrors = [];
         
-        // Destroy all virtual polygons
-        this.virtualPolygons.forEach(virtualPolygon => virtualPolygon.destroy());
-        this.virtualPolygons = [];
+        // Destroy reflection engine and all virtual polygons
+        this.reflectionEngine.destroy();
     }
 }
