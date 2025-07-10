@@ -12,8 +12,8 @@ svgCanvas.setAttribute('height', generalConfig.canvas.height);
 
 const simulation = new SimpleReflectionMode({
     sceneEntities: sceneEntities,
+    modeConfig: modeConfig,
     svgCanvas: svgCanvas,
-    modeConfig: modeConfig
 });
 
 simulation.init();

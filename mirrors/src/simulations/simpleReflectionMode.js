@@ -14,10 +14,10 @@ export class SimpleReflectionMode {
     /**
      * @param {Object} config
      * @param {Object} config.sceneEntities - Scene configuration containing objects
-     * @param {SVGElement} config.svgCanvas - SVG element for rendering
      * @param {Object} config.modeConfig - Mode-specific configuration
+     * @param {SVGElement} config.svgCanvas - SVG element for rendering
      */
-    constructor({ sceneEntities, svgCanvas, modeConfig }) {
+    constructor({ sceneEntities, modeConfig, svgCanvas }) {
         this.objectConfigs = sceneEntities.objects || [];
         this.mirrorConfigs = sceneEntities.mirrors || [];
         this.modeConfig = modeConfig;
