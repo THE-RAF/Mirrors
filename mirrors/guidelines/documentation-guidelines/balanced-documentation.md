@@ -37,14 +37,15 @@ class ClassName {
 - **Public API methods** with parameters
 - **Complex business logic**
 - **Methods with non-obvious return values**
+- **Detail about custom data types**
 
 ### Template:
 ```javascript
 /**
  * [What method does - one clear sentence]
  * @param {Object} config
- * @param {type} config.param - Description
- * @returns {type} What is returned
+ * @param {type} config.param - Description and an example of it's data type if not obvious
+ * @returns {type} What is returned and an example of it's data type if not obvious
  */
 methodName({ param }) { }
 ```
