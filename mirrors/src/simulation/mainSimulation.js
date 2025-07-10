@@ -1,15 +1,15 @@
 /**
- * @file mainSimulation2.js - Simplified main simulation
- * Main exports: MainSimulation2
+ * @file mainSimulation.js - Simplified main simulation
+ * Main exports: MainSimulation
  */
 
 import { Polygon } from '../entities/real/Polygon.js';
 
 /**
- * @class MainSimulation2
+ * @class MainSimulation
  * Minimal simulation engine for managing polygon objects in SVG
  */
-export class MainSimulation2 {
+export class MainSimulation {
     /**
      * @param {Object} config
      * @param {Object} config.sceneEntities - Scene configuration containing objects
