@@ -3,15 +3,19 @@
  */
 
 import { MainSimulation } from './simulation/mainSimulation.js';
-import { defaultScene } from './config/scenesConfig.js';
+import { MainSimulation2 } from './simulation2/mainSimulation2.js';
+import { sceneEntities } from './config/scenesConfig.js';
 import { generalConfig } from './config/generalConfig.js';
 
 // Create and initialize the simulation
-const simulation = new MainSimulation({
-    canvas: document.getElementById('mirror-canvas'),
-    width: generalConfig.canvas.width,
-    height: generalConfig.canvas.height,
-    ...defaultScene
+// const simulation = new MainSimulation({
+//     canvas: document.getElementById('mirror-canvas'),
+//     ...sceneEntities
+// });
+
+const simulation = new MainSimulation2({
+    sceneEntities: sceneEntities,
+    svgCanvas: document.getElementById('mirror-canvas')
 });
 
 simulation.init();
