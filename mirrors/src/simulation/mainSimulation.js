@@ -3,7 +3,7 @@
  * Main exports: MainSimulation2
  */
 
-import { Polygon } from '../entities2/real/Polygon.js';
+import { Polygon } from '../entities/real/Polygon.js';
 
 /**
  * @class MainSimulation2
