@@ -22,10 +22,11 @@ export class ReflectionEngine {
 
     /**
      * Create reflections of all polygons across all mirrors
-     * @param {Array} polygons - Array of real polygon objects
-     * @param {Array} mirrors - Array of mirror objects
+     * @param {Object} config
+     * @param {Array} config.polygons - Array of real polygon objects
+     * @param {Array} config.mirrors - Array of mirror objects
      */
-    createReflections(polygons, mirrors) {
+    createReflections({ polygons, mirrors }) {
         polygons.forEach(polygon => {
             mirrors.forEach(mirror => {
                 // Define mirror axis from mirror coordinates
@@ -56,12 +57,13 @@ export class ReflectionEngine {
 
     /**
      * Update all reflections based on current polygon and mirror positions
-     * @param {Array} polygons - Array of real polygon objects
-     * @param {Array} mirrors - Array of mirror objects
+     * @param {Object} config
+     * @param {Array} config.polygons - Array of real polygon objects
+     * @param {Array} config.mirrors - Array of mirror objects
      */
-    updateReflections(polygons, mirrors) {
+    updateReflections({ polygons, mirrors }) {
         this.clearReflections();
-        this.createReflections(polygons, mirrors);
+        this.createReflections({ polygons, mirrors });
     }
 
     /**

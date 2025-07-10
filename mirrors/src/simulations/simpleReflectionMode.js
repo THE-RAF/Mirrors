@@ -6,6 +6,7 @@
 import { Polygon } from '../basicEntities/real/Polygon.js';
 import { Mirror } from '../basicEntities/real/Mirror.js';
 import { ReflectionEngine } from '../engines/ReflectionEngine.js';
+import { LightBeamEngine } from '../engines/LightBeamEngine.js';
 
 /**
  * @class SimpleReflectionMode
@@ -26,8 +27,9 @@ export class SimpleReflectionMode {
         this.polygons = [];
         this.mirrors = [];
         
-        // Initialize reflection engine
+        // Initialize engines
         this.reflectionEngine = new ReflectionEngine({ svgCanvas });
+        this.lightBeamEngine = new LightBeamEngine({ svgCanvas });
     }
     
     /**
@@ -36,7 +38,8 @@ export class SimpleReflectionMode {
     init() {
         this.createPolygons();
         this.createMirrors();
-        this.reflectionEngine.createReflections(this.polygons, this.mirrors);
+        this.lightBeamEngine.createSampleLightBeam();
+        this.reflectionEngine.createReflections({ polygons: this.polygons, mirrors: this.mirrors });
         this.setupReflectionUpdates();
     }
 
@@ -63,7 +66,7 @@ export class SimpleReflectionMode {
         document.addEventListener('mousemove', () => {
             // Check if any real scene element is being dragged
             if (this.isSceneBeingDragged()) {
-                this.reflectionEngine.updateReflections(this.polygons, this.mirrors);
+                this.reflectionEngine.updateReflections({ polygons: this.polygons, mirrors: this.mirrors });
             }
         });
     }
@@ -110,7 +113,8 @@ export class SimpleReflectionMode {
         this.mirrors.forEach(mirror => mirror.destroy());
         this.mirrors = [];
         
-        // Destroy reflection engine and all virtual polygons
+        // Destroy engines and all their managed objects
         this.reflectionEngine.destroy();
+        this.lightBeamEngine.destroy();
     }
 }
