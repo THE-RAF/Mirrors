@@ -7,7 +7,7 @@ import { createTriangle, createSquare } from '../utils/geometry.js';
 export const modeConfig = {
     interaction: {
         draggablePolygons: true,
-        draggableMirrors: false
+        draggableMirrors: true
     }
 };
 
@@ -28,7 +28,12 @@ export const sceneEntities = {
         {
             // Vertical mirror in the center
             x1: 400, y1: 300,
-            x2: 400, y2: 500,
+            x2: 350, y2: 500,
+        },
+        {
+            // Horizontal mirror at the top
+            x1: 300, y1: 300,
+            x2: 500, y2: 300,
         }
     ]
 };
