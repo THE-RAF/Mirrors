@@ -1,26 +1,26 @@
 /**
- * @file mainSimulation.js - Simplified main simulation
- * Main exports: MainSimulation
+ * @file simpleReflectionMode.js - Simple reflection mode simulation
+ * Main exports: SimpleReflectionMode
  */
 
 import { Polygon } from '../basicEntities/real/Polygon.js';
 import { Mirror } from '../basicEntities/real/Mirror.js';
 
 /**
- * @class MainSimulation
+ * @class SimpleReflectionMode
  * Minimal simulation engine for managing polygon objects in SVG
  */
-export class MainSimulation {
+export class SimpleReflectionMode {
     /**
      * @param {Object} config
      * @param {Object} config.sceneEntities - Scene configuration containing objects
      * @param {SVGElement} config.svgCanvas - SVG element for rendering
-     * @param {Object} config.generalConfig - General application configuration
+     * @param {Object} config.modeConfig - Mode-specific configuration
      */
-    constructor({ sceneEntities, generalConfig, svgCanvas }) {
+    constructor({ sceneEntities, svgCanvas, modeConfig }) {
         this.objectConfigs = sceneEntities.objects || [];
         this.mirrorConfigs = sceneEntities.mirrors || [];
-        this.generalConfig = generalConfig;
+        this.modeConfig = modeConfig;
         this.svgCanvas = svgCanvas;
         this.polygons = [];
         this.mirrors = [];
@@ -30,7 +30,6 @@ export class MainSimulation {
      * Initialize the simulation environment and create all entities
      */
     init() {
-        console.log('MainSimulation initialized');
         this.createPolygons();
         this.createMirrors();
     }
@@ -39,54 +38,42 @@ export class MainSimulation {
      * Create Polygon instances and their SVG elements
      */
     createPolygons() {
-        this.polygons = this.objectConfigs.map(objConfig => {
-            const polygon = new Polygon({
+        this.polygons = this.objectConfigs.map(objConfig => 
+            new Polygon({
                 vertices: objConfig.vertices,
                 fill: objConfig.fill,
-                stroke: objConfig.stroke,
-                strokeWidth: objConfig.strokeWidth,
                 parentSvg: this.svgCanvas,
-                draggable: this.generalConfig.interaction.draggablePolygons
-            });
-            
-            return polygon;
-        });
+                draggable: this.modeConfig.interaction?.draggablePolygons ?? true
+            })
+        );
     }
 
     /**
      * Create Mirror instances and their SVG elements
      */
     createMirrors() {
-        this.mirrors = this.mirrorConfigs.map(mirrorConfig => {
-            const mirror = new Mirror({
+        this.mirrors = this.mirrorConfigs.map(mirrorConfig =>
+            new Mirror({
                 x1: mirrorConfig.x1,
                 y1: mirrorConfig.y1,
                 x2: mirrorConfig.x2,
                 y2: mirrorConfig.y2,
-                thickness: mirrorConfig.thickness,
-                reflectiveColor: mirrorConfig.reflectiveColor,
-                backColor: mirrorConfig.backColor,
-                strokeWidth: mirrorConfig.strokeWidth,
                 parentSvg: this.svgCanvas,
-                draggable: this.generalConfig.interaction.draggableMirrors
-            });
-            
-            return mirror;
-        });
+                draggable: this.modeConfig.interaction?.draggableMirrors ?? true
+            })
+        );
     }
-    
+
     /**
-     * Clean up simulation resources and stop all processes
+     * Clean up all simulation resources
      */
     destroy() {
         // Destroy all polygons
         this.polygons.forEach(polygon => polygon.destroy());
         this.polygons = [];
-        
+
         // Destroy all mirrors
         this.mirrors.forEach(mirror => mirror.destroy());
         this.mirrors = [];
-        
-        console.log('MainSimulation destroyed');
     }
 }

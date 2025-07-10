@@ -2,18 +2,18 @@
  * @file main.js - Mirror Reflection Sandbox main entry point
  */
 
-import { MainSimulation } from './simulation/mainSimulation.js';
-import { sceneEntities } from './config/scenesConfig.js';
+import { SimpleReflectionMode } from './simulations/simpleReflectionMode.js';
+import { sceneEntities, modeConfig } from './config/simpleReflectionModeConfig.js';
 import { generalConfig } from './config/generalConfig.js';
 
 const svgCanvas = document.getElementById('mirror-canvas');
 svgCanvas.setAttribute('width', generalConfig.canvas.width);
 svgCanvas.setAttribute('height', generalConfig.canvas.height);
 
-const simulation = new MainSimulation({
+const simulation = new SimpleReflectionMode({
     sceneEntities: sceneEntities,
     svgCanvas: svgCanvas,
-    generalConfig: generalConfig
+    modeConfig: modeConfig
 });
 
 simulation.init();
