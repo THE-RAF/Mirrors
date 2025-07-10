@@ -1,26 +1,21 @@
 /**
- * @file defaultScene.js - Default scene configuration
+ * @file scenesConfig.js - Default scene configuration
  */
 
 import { createTriangle, createSquare } from '../utils/geometry.js';
-
-// Object positions
-const triangleCenter = { x: '48%', y: '48.5%' };
-const squareCenter = { x: '52%', y: '47%' };
-const viewerCenter = { x: '50%', y: '53%' };
 
 export const defaultScene = {
     objects: [
         {
             // Triangle in the center
-            vertices: createTriangle({ center: triangleCenter }),
+            vertices: createTriangle({ center: { x: '48%', y: '48.5%' } }),
             fill: '#ff6b6b',
             stroke: '#333',
             strokeWidth: 2
         },
         {
             // Square on the right
-            vertices: createSquare({ center: squareCenter }),
+            vertices: createSquare({ center: { x: '52%', y: '47%' } }),
             fill: '#ffcc00',
             stroke: '#333',
             strokeWidth: 2
@@ -58,8 +53,8 @@ export const defaultScene = {
     ],
     viewer: {
         // Viewer below the triangle
-        x: viewerCenter.x,
-        y: viewerCenter.y,
+        x: '50%',
+        y: '53%',
         radius: 12,
         fill: '#007acc',
         stroke: '#005a99',
