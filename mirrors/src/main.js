@@ -7,6 +7,8 @@ import { sceneEntities } from './config/scenesConfig.js';
 import { generalConfig } from './config/generalConfig.js';
 
 const svgCanvas = document.getElementById('mirror-canvas');
+svgCanvas.setAttribute('width', generalConfig.canvas.width);
+svgCanvas.setAttribute('height', generalConfig.canvas.height);
 
 const simulation = new MainSimulation({
     sceneEntities: sceneEntities,

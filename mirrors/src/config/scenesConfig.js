@@ -9,46 +9,34 @@ export const sceneEntities = {
         {
             // Triangle in the center
             vertices: createTriangle({ center: { x: 384, y: 388 } }), // 48% = 384px, 48.5% = 388px
-            fill: '#ff6b6b',
-            stroke: '#333',
-            strokeWidth: 2
+            fill: '#ff6b6b'
         },
         {
             // Square on the right
             vertices: createSquare({ center: { x: 416, y: 376 } }), // 52% = 416px, 47% = 376px
             fill: '#ffcc00',
-            stroke: '#333',
-            strokeWidth: 2
         }
     ],
     mirrors: [
         {
-            // Vertical mirror at 40% of canvas width
-            x1: 320, y1: 0,    // 40% = 320px, 0% = 0px
-            x2: 320, y2: 800,  // 40% = 320px, 100% = 800px
-            stroke: '#2c3e50',
-            strokeWidth: 3
+            // Vertical mirror in the left side
+            x1: 300, y1: 500,    // Center vertical line
+            x2: 300, y2: 300,    // From 200px to 600px height
         },
         {
-            // Vertical mirror at 60% of canvas width
-            x1: 480, y1: 0,    // 60% = 480px, 0% = 0px
-            x2: 480, y2: 800,  // 60% = 480px, 100% = 800px
-            stroke: '#2c3e50',
-            strokeWidth: 3
+            // Horizontal mirror at the top
+            x1: 300, y1: 300,    // Center horizontal line
+            x2: 500, y2: 300,    // From 200px to 600px width
         },
         {
-            // Horizontal mirror at 40% of canvas height
-            x1: 0, y1: 320,    // 0% = 0px, 40% = 320px
-            x2: 800, y2: 320,  // 100% = 800px, 40% = 320px
-            stroke: '#2c3e50',
-            strokeWidth: 3
+            // vertical mirror in the right side
+            x1: 500, y1: 300,    // Center vertical line
+            x2: 500, y2: 500,    // From 200px to 600px height
         },
         {
-            // Horizontal mirror at 60% of canvas height
-            x1: 0, y1: 480,    // 0% = 0px, 60% = 480px
-            x2: 800, y2: 480,  // 100% = 800px, 60% = 480px
-            stroke: '#2c3e50',
-            strokeWidth: 3
+            // Horizontal mirror at the bottom
+            x1: 500, y1: 500,    // Center horizontal line
+            x2: 300, y2: 500,    // From 200px to 600px width
         }
     ],
     viewer: {

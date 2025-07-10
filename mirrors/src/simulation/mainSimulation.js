@@ -4,6 +4,7 @@
  */
 
 import { Polygon } from '../entities/real/Polygon.js';
+import { Mirror } from '../entities/real/Mirror.js';
 
 /**
  * @class MainSimulation
@@ -18,17 +19,20 @@ export class MainSimulation {
      */
     constructor({ sceneEntities, generalConfig, svgCanvas }) {
         this.objectConfigs = sceneEntities.objects || [];
+        this.mirrorConfigs = sceneEntities.mirrors || [];
         this.generalConfig = generalConfig;
         this.svgCanvas = svgCanvas;
         this.polygons = [];
+        this.mirrors = [];
     }
     
     /**
-     * Initialize the simulation environment and create polygons
+     * Initialize the simulation environment and create all entities
      */
     init() {
-        console.log('MainSimulation2 initialized');
+        console.log('MainSimulation initialized');
         this.createPolygons();
+        this.createMirrors();
     }
 
     /**
@@ -48,6 +52,28 @@ export class MainSimulation {
             return polygon;
         });
     }
+
+    /**
+     * Create Mirror instances and their SVG elements
+     */
+    createMirrors() {
+        this.mirrors = this.mirrorConfigs.map(mirrorConfig => {
+            const mirror = new Mirror({
+                x1: mirrorConfig.x1,
+                y1: mirrorConfig.y1,
+                x2: mirrorConfig.x2,
+                y2: mirrorConfig.y2,
+                thickness: mirrorConfig.thickness,
+                reflectiveColor: mirrorConfig.reflectiveColor,
+                backColor: mirrorConfig.backColor,
+                strokeWidth: mirrorConfig.strokeWidth,
+                parentSvg: this.svgCanvas,
+                draggable: this.generalConfig.interaction.draggableMirrors
+            });
+            
+            return mirror;
+        });
+    }
     
     /**
      * Clean up simulation resources and stop all processes
@@ -56,6 +82,11 @@ export class MainSimulation {
         // Destroy all polygons
         this.polygons.forEach(polygon => polygon.destroy());
         this.polygons = [];
-        console.log('MainSimulation2 destroyed');
+        
+        // Destroy all mirrors
+        this.mirrors.forEach(mirror => mirror.destroy());
+        this.mirrors = [];
+        
+        console.log('MainSimulation destroyed');
     }
 }

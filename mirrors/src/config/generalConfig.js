@@ -8,6 +8,7 @@ export const generalConfig = {
         height: 800
     },
     interaction: {
-        draggablePolygons: true
+        draggablePolygons: true,
+        draggableMirrors: false
     }
 };
