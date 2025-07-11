@@ -4,7 +4,7 @@
  */
 
 import { LightBeam } from '../basicEntities/light/LightBeam.js';
-import { lineToLineIntersection, reflectVectorOverAxis } from '../math/analyticalGeometry.js';
+import { rayToLineIntersection, reflectVectorOverAxis } from '../math/analyticalGeometry.js';
 
 /**
  * @class LightBeamEngine
@@ -38,11 +38,10 @@ export class LightBeamEngine {
             let closestMirror = null;
             
             for (const mirror of mirrors) {
-                const intersection = lineToLineIntersection({
+                const intersection = rayToLineIntersection({
                     rayStart,
                     rayDirection,
-                    lineStart: { x: mirror.x1, y: mirror.y1 },
-                    lineEnd: { x: mirror.x2, y: mirror.y2 }
+                    axis: { x1: mirror.x1, y1: mirror.y1, x2: mirror.x2, y2: mirror.y2 }
                 });
                 
                 if (intersection) {
@@ -92,8 +91,7 @@ export class LightBeamEngine {
                 // Reflect direction
                 currentDirection = reflectVectorOverAxis({
                     vector: currentDirection,
-                    lineStart: { x: mirror.x1, y: mirror.y1 },
-                    lineEnd: { x: mirror.x2, y: mirror.y2 }
+                    axis: { x1: mirror.x1, y1: mirror.y1, x2: mirror.x2, y2: mirror.y2 }
                 });
                 
                 currentPoint = intersection;
