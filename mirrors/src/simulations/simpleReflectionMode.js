@@ -5,6 +5,7 @@
 
 import { Polygon } from '../basicEntities/real/Polygon.js';
 import { Mirror } from '../basicEntities/real/Mirror.js';
+import { Viewer } from '../basicEntities/real/Viewer.js';
 import { ReflectionEngine } from '../engines/ReflectionEngine.js';
 import { LightBeamEngine } from '../engines/LightBeamEngine.js';
 
@@ -22,11 +23,13 @@ export class SimpleReflectionMode {
     constructor({ sceneEntities, modeConfig, svgCanvas }) {
         this.objectConfigs = sceneEntities.objects || [];
         this.mirrorConfigs = sceneEntities.mirrors || [];
+        this.viewerConfigs = sceneEntities.viewers || [];
         this.lightBeamConfigs = sceneEntities.lightBeams || [];
         this.modeConfig = modeConfig;
         this.svgCanvas = svgCanvas;
         this.polygons = [];
         this.mirrors = [];
+        this.viewers = [];
         
         // Initialize engines
         this.reflectionEngine = new ReflectionEngine({ svgCanvas });
@@ -39,6 +42,7 @@ export class SimpleReflectionMode {
     init() {
         this.createPolygonsFromConfig();
         this.createMirrorsFromConfig();
+        this.createViewersFromConfig();
         this.createLightBeamsFromConfig();
         this.reflectionEngine.createReflections({ polygons: this.polygons, mirrors: this.mirrors });
         this.setupSceneUpdates();
@@ -77,6 +81,24 @@ export class SimpleReflectionMode {
     }
 
     /**
+     * Create Viewer instances and their SVG elements from configuration
+     */
+    createViewersFromConfig() {
+        this.viewers = this.viewerConfigs.map(viewerConfig =>
+            new Viewer({
+                x: viewerConfig.x,
+                y: viewerConfig.y,
+                radius: viewerConfig.radius || 8,
+                fill: viewerConfig.fill || '#4a90e2',
+                stroke: viewerConfig.stroke || '#333',
+                strokeWidth: viewerConfig.strokeWidth || 2,
+                parentSvg: this.svgCanvas,
+                draggable: this.modeConfig.interaction?.draggableViewers ?? true
+            })
+        );
+    }
+
+    /**
      * Create LightBeam instances from configuration
      */
     createLightBeamsFromConfig() {
@@ -109,7 +131,7 @@ export class SimpleReflectionMode {
 
     /**
      * Check if any element in the real scene is being dragged
-     * @returns {boolean} True if any polygon or mirror is being dragged
+     * @returns {boolean} True if any polygon, mirror, or viewer is being dragged
      */
     isSceneBeingDragged() {
         // Check if any polygon is being dragged
@@ -118,7 +140,10 @@ export class SimpleReflectionMode {
         // Check if any mirror is being dragged
         const mirrorDragging = this.mirrors.some(mirror => mirror.isDragging);
         
-        return polygonDragging || mirrorDragging;
+        // Check if any viewer is being dragged
+        const viewerDragging = this.viewers.some(viewer => viewer.isDragging);
+        
+        return polygonDragging || mirrorDragging || viewerDragging;
     }
 
     /**
