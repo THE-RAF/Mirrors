@@ -35,5 +35,23 @@ export const sceneEntities = {
             x1: 300, y1: 300,
             x2: 500, y2: 300,
         }
+    ],
+    lightBeams: [
+        {
+            // Horizontal beam from left
+            emissionPoint: { x: 150, y: 400 },
+            directorVector: { x: 1, y: 0 },
+            maxLength: 800,
+            stroke: '#ffdd00',
+            strokeWidth: 2
+        },
+        {
+            // Diagonal beam from bottom left
+            emissionPoint: { x: 200, y: 500 },
+            directorVector: { x: 0.8, y: -0.6 },
+            maxLength: 600,
+            stroke: '#00ff88',
+            strokeWidth: 2
+        }
     ]
 };

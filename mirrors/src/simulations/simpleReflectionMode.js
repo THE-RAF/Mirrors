@@ -22,6 +22,7 @@ export class SimpleReflectionMode {
     constructor({ sceneEntities, modeConfig, svgCanvas }) {
         this.objectConfigs = sceneEntities.objects || [];
         this.mirrorConfigs = sceneEntities.mirrors || [];
+        this.lightBeamConfigs = sceneEntities.lightBeams || [];
         this.modeConfig = modeConfig;
         this.svgCanvas = svgCanvas;
         this.polygons = [];
@@ -36,21 +37,17 @@ export class SimpleReflectionMode {
      * Initialize the simulation environment and create all entities
      */
     init() {
-        this.createPolygons();
-        this.createMirrors();
-        this.lightBeamEngine.createLightBeam({
-            emissionPoint: { x: 150, y: 400 },
-            directorVector: { x: 1, y: 0 },
-            mirrors: this.mirrors,
-        });
+        this.createPolygonsFromConfig();
+        this.createMirrorsFromConfig();
+        this.createLightBeamsFromConfig();
         this.reflectionEngine.createReflections({ polygons: this.polygons, mirrors: this.mirrors });
         this.setupSceneUpdates();
     }
 
     /**
-     * Create Polygon instances and their SVG elements
+     * Create Polygon instances and their SVG elements from configuration
      */
-    createPolygons() {
+    createPolygonsFromConfig() {
         this.polygons = this.objectConfigs.map(objConfig => {
             const polygon = new Polygon({
                 vertices: objConfig.vertices,
@@ -60,6 +57,38 @@ export class SimpleReflectionMode {
             });
             
             return polygon;
+        });
+    }
+
+    /**
+     * Create Mirror instances and their SVG elements from configuration
+     */
+    createMirrorsFromConfig() {
+        this.mirrors = this.mirrorConfigs.map(mirrorConfig =>
+            new Mirror({
+                x1: mirrorConfig.x1,
+                y1: mirrorConfig.y1,
+                x2: mirrorConfig.x2,
+                y2: mirrorConfig.y2,
+                parentSvg: this.svgCanvas,
+                draggable: this.modeConfig.interaction?.draggableMirrors ?? true
+            })
+        );
+    }
+
+    /**
+     * Create LightBeam instances from configuration
+     */
+    createLightBeamsFromConfig() {
+        this.lightBeamConfigs.forEach(beamConfig => {
+            this.lightBeamEngine.createLightBeam({
+                emissionPoint: beamConfig.emissionPoint,
+                directorVector: beamConfig.directorVector,
+                maxLength: beamConfig.maxLength || 800,
+                stroke: beamConfig.stroke || '#ffdd00',
+                strokeWidth: beamConfig.strokeWidth || 2,
+                mirrors: this.mirrors
+            });
         });
     }
 
@@ -88,22 +117,6 @@ export class SimpleReflectionMode {
         const mirrorDragging = this.mirrors.some(mirror => mirror.isDragging);
         
         return polygonDragging || mirrorDragging;
-    }
-
-    /**
-     * Create Mirror instances and their SVG elements
-     */
-    createMirrors() {
-        this.mirrors = this.mirrorConfigs.map(mirrorConfig =>
-            new Mirror({
-                x1: mirrorConfig.x1,
-                y1: mirrorConfig.y1,
-                x2: mirrorConfig.x2,
-                y2: mirrorConfig.y2,
-                parentSvg: this.svgCanvas,
-                draggable: this.modeConfig.interaction?.draggableMirrors ?? true
-            })
-        );
     }
 
     /**
