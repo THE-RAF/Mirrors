@@ -28,7 +28,7 @@ export class VirtualPolygon extends Polygon {
         strokeWidth = 2, 
         parentSvg, 
         draggable = false,
-        clickable = false,
+        clickable = true,
         onVirtualClick = null
     }) {
         super({
@@ -97,7 +97,7 @@ export class VirtualPolygon extends Polygon {
         
         this.element.addEventListener('mouseleave', () => {
             if (this.clickable) {
-                this.element.setAttribute('opacity', '0.6');
+                this.element.setAttribute('opacity', '0.5');
             }
         });
     }
