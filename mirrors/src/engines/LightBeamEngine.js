@@ -173,6 +173,8 @@ export class LightBeamEngine {
      * @param {string} [config.stroke='#ffff00'] - Beam color
      * @param {number} [config.strokeWidth=2] - Beam width
      * @param {number} [config.maxLength=800] - Maximum ray length
+     * @param {boolean} [config.animated=true] - Whether to animate beam creation
+     * @param {number} [config.animationDuration=1000] - Duration of creation animation in milliseconds
      * @returns {LightBeam} The created light beam
      */
     createLightBeam({ 
@@ -181,7 +183,9 @@ export class LightBeamEngine {
         mirrors = [], 
         stroke = '#ffdd00', 
         strokeWidth = 2, 
-        maxLength = 800 
+        maxLength = 800,
+        animated = true,
+        animationDuration = 1000
     }) {
         // Normalize the director vector
         const normalizedVector = normalizeVector({ vector: directorVector });
@@ -201,6 +205,8 @@ export class LightBeamEngine {
             points, // Pass calculated points
             stroke,
             strokeWidth,
+            animated,
+            animationDuration,
             parentSvg: this.svgCanvas
         });
 

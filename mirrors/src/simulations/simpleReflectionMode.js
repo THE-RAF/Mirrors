@@ -87,6 +87,8 @@ export class SimpleReflectionMode {
                 maxLength: beamConfig.maxLength || 800,
                 stroke: beamConfig.stroke || '#ffdd00',
                 strokeWidth: beamConfig.strokeWidth || 2,
+                animated: beamConfig.animated ?? true,
+                animationDuration: beamConfig.animationDuration || 1000,
                 mirrors: this.mirrors
             });
         });

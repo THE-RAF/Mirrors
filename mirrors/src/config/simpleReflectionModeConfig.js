@@ -43,7 +43,9 @@ export const sceneEntities = {
             directorVector: { x: 1, y: 0 },
             maxLength: 800,
             stroke: '#ffdd00',
-            strokeWidth: 2
+            strokeWidth: 2,
+            animated: true,
+            animationDuration: 1000
         },
         {
             // Diagonal beam from bottom left
@@ -51,7 +53,9 @@ export const sceneEntities = {
             directorVector: { x: 0.8, y: -0.6 },
             maxLength: 600,
             stroke: '#00ff88',
-            strokeWidth: 2
+            strokeWidth: 2,
+            animated: true,
+            animationDuration: 1000
         }
     ]
 };
