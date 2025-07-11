@@ -71,6 +71,9 @@ export class LightBeam {
             return this.element;
         }
         
+        // Ensure glow filter exists
+        this.createGlowFilter(parentSvg);
+        
         // Create SVG polyline element
         this.element = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
         
@@ -88,7 +91,10 @@ export class LightBeam {
         // Add some visual styling for light beam appearance
         this.element.setAttribute('stroke-linecap', 'round');
         this.element.setAttribute('stroke-linejoin', 'round');
-        this.element.setAttribute('opacity', 0.8);
+        this.element.setAttribute('opacity', 0.9);
+        
+        // Apply subtle glow effect
+        this.element.setAttribute('filter', 'url(#lightBeamGlow)');
 
         // Add to parent SVG
         parentSvg.appendChild(this.element);
@@ -152,5 +158,52 @@ export class LightBeam {
             this.element.parentNode.removeChild(this.element);
         }
         this.element = null;
+    }
+    
+    /**
+     * Create a subtle glow filter for light beams (only creates once per SVG)
+     * @param {SVGElement} parentSvg - Parent SVG container
+     */
+    createGlowFilter(parentSvg) {
+        // Check if filter already exists
+        if (parentSvg.querySelector('#lightBeamGlow')) {
+            return;
+        }
+        
+        // Create defs element if it doesn't exist
+        let defs = parentSvg.querySelector('defs');
+        if (!defs) {
+            defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            parentSvg.insertBefore(defs, parentSvg.firstChild);
+        }
+        
+        // Create filter element
+        const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+        filter.setAttribute('id', 'lightBeamGlow');
+        filter.setAttribute('x', '-50%');
+        filter.setAttribute('y', '-50%');
+        filter.setAttribute('width', '200%');
+        filter.setAttribute('height', '200%');
+        
+        // Create Gaussian blur for glow effect
+        const feGaussianBlur = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
+        feGaussianBlur.setAttribute('stdDeviation', '2');
+        feGaussianBlur.setAttribute('result', 'coloredBlur');
+        
+        // Merge the blur with the original
+        const feMerge = document.createElementNS('http://www.w3.org/2000/svg', 'feMerge');
+        
+        const feMergeNode1 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
+        feMergeNode1.setAttribute('in', 'coloredBlur');
+        
+        const feMergeNode2 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
+        feMergeNode2.setAttribute('in', 'SourceGraphic');
+        
+        feMerge.appendChild(feMergeNode1);
+        feMerge.appendChild(feMergeNode2);
+        
+        filter.appendChild(feGaussianBlur);
+        filter.appendChild(feMerge);
+        defs.appendChild(filter);
     }
 }
