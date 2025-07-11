@@ -42,7 +42,7 @@ export const sceneEntities = {
             // Main viewer position
             x: 180,
             y: 320,
-            radius: 10,
+            radius: 12,
             fill: '#4a90e2'
         }
     ],

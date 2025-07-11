@@ -44,7 +44,7 @@ export class SimpleReflectionMode {
         this.createMirrorsFromConfig();
         this.createViewersFromConfig();
         this.createLightBeamsFromConfig();
-        this.reflectionEngine.createReflections({ polygons: this.polygons, mirrors: this.mirrors });
+        this.reflectionEngine.createReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
         this.setupSceneUpdates();
     }
 
@@ -123,7 +123,7 @@ export class SimpleReflectionMode {
         document.addEventListener('mousemove', () => {
             // Check if any real scene element is being dragged
             if (this.isSceneBeingDragged()) {
-                this.reflectionEngine.updateReflections({ polygons: this.polygons, mirrors: this.mirrors });
+                this.reflectionEngine.updateReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
                 this.lightBeamEngine.updateAllLightBeamReflections({ mirrors: this.mirrors });
             }
         });

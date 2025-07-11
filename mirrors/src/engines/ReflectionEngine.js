@@ -4,29 +4,33 @@
  */
 
 import { VirtualPolygon } from '../basicEntities/virtual/VirtualPolygon.js';
+import { VirtualViewer } from '../basicEntities/virtual/VirtualViewer.js';
 import { reflectPolygonOverAxis } from '../math/analyticalGeometry.js';
 
 /**
  * @class ReflectionEngine
- * Handles creation, updating, and management of virtual polygon reflections
+ * Handles creation, updating, and management of virtual polygon and viewer reflections
  */
 export class ReflectionEngine {
     /**
      * @param {Object} config
-     * @param {SVGElement} config.svgCanvas - SVG element for rendering virtual polygons
+     * @param {SVGElement} config.svgCanvas - SVG element for rendering virtual objects
      */
     constructor({ svgCanvas }) {
         this.svgCanvas = svgCanvas;
         this.virtualPolygons = [];
+        this.virtualViewers = [];
     }
 
     /**
-     * Create reflections of all polygons across all mirrors
+     * Create reflections of all polygons and viewers across all mirrors
      * @param {Object} config
      * @param {Array} config.polygons - Array of real polygon objects
+     * @param {Array} [config.viewers] - Array of real viewer objects
      * @param {Array} config.mirrors - Array of mirror objects
      */
-    createReflections({ polygons, mirrors }) {
+    createReflections({ polygons, viewers = [], mirrors }) {
+        // Reflect polygons
         polygons.forEach(polygon => {
             mirrors.forEach(mirror => {
                 // Define mirror axis from mirror coordinates
@@ -53,25 +57,60 @@ export class ReflectionEngine {
                 this.virtualPolygons.push(virtualPolygon);
             });
         });
+
+        // Reflect viewers
+        viewers.forEach(viewer => {
+            mirrors.forEach(mirror => {
+                // Define mirror axis from mirror coordinates
+                const axis = {
+                    x1: mirror.x1,
+                    y1: mirror.y1,
+                    x2: mirror.x2,
+                    y2: mirror.y2
+                };
+                
+                // Reflect viewer position (single point)
+                const reflectedPoint = reflectPolygonOverAxis({
+                    polygon: [{ x: viewer.x, y: viewer.y }],
+                    axis: axis
+                })[0];
+                
+                // Create virtual viewer for the reflection
+                const virtualViewer = new VirtualViewer({
+                    x: reflectedPoint.x,
+                    y: reflectedPoint.y,
+                    radius: viewer.radius,
+                    fill: viewer.fill,
+                    stroke: viewer.stroke,
+                    strokeWidth: viewer.strokeWidth,
+                    parentSvg: this.svgCanvas
+                });
+                
+                this.virtualViewers.push(virtualViewer);
+            });
+        });
     }
 
     /**
-     * Update all reflections based on current polygon and mirror positions
+     * Update all reflections based on current polygon, viewer, and mirror positions
      * @param {Object} config
      * @param {Array} config.polygons - Array of real polygon objects
+     * @param {Array} [config.viewers] - Array of real viewer objects
      * @param {Array} config.mirrors - Array of mirror objects
      */
-    updateReflections({ polygons, mirrors }) {
+    updateReflections({ polygons, viewers = [], mirrors }) {
         this.clearReflections();
-        this.createReflections({ polygons, mirrors });
+        this.createReflections({ polygons, viewers, mirrors });
     }
 
     /**
-     * Clear all existing virtual polygon reflections
+     * Clear all existing virtual reflections
      */
     clearReflections() {
         this.virtualPolygons.forEach(virtualPolygon => virtualPolygon.destroy());
+        this.virtualViewers.forEach(virtualViewer => virtualViewer.destroy());
         this.virtualPolygons = [];
+        this.virtualViewers = [];
     }
 
     /**

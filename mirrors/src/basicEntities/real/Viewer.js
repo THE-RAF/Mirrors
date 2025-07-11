@@ -22,7 +22,7 @@ export class Viewer {
     constructor({ 
         x, 
         y, 
-        radius = 8, 
+        radius = 12, 
         fill = '#4a90e2', 
         stroke = '#333', 
         strokeWidth = 2, 
