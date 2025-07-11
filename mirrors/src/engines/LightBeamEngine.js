@@ -150,18 +150,6 @@ export class LightBeamEngine {
     }
 
     /**
-     * Update light beam paths based on current scene state
-     * @param {Array} mirrors - Array of mirror objects for ray tracing
-     * @param {Array} polygons - Array of polygon objects for collision detection
-     * TODO: Implement ray tracing logic
-     */
-    updateLightBeams(mirrors = [], polygons = []) {
-        // Placeholder for future ray tracing implementation
-        // This will calculate intersections with mirrors and polygons
-        // and update light beam paths accordingly
-    }
-
-    /**
      * Clear all existing light beams
      */
     clearLightBeams() {
