@@ -16,6 +16,8 @@ export class LightBeam {
      * @param {Array} [config.points] - Array of {x, y} points defining the light beam path (calculated if not provided)
      * @param {string} [config.stroke='#ffff00'] - Stroke color of the light beam
      * @param {number} [config.strokeWidth=2] - Stroke width of the light beam
+     * @param {boolean} [config.animated=true] - Whether to animate beam creation
+     * @param {number} [config.animationDuration=1000] - Duration of creation animation in milliseconds
      * @param {SVGElement} config.parentSvg - Parent SVG container
      */
     constructor({ 
@@ -24,7 +26,9 @@ export class LightBeam {
         maxLength = 800,
         points = null,
         stroke = '#f5e911', 
-        strokeWidth = 2, 
+        strokeWidth = 2,
+        animated = true,
+        animationDuration = 1000,
         parentSvg 
     }) {
         this.emissionPoint = emissionPoint;
@@ -32,6 +36,8 @@ export class LightBeam {
         this.maxLength = maxLength;
         this.stroke = stroke;
         this.strokeWidth = strokeWidth;
+        this.animated = animated;
+        this.animationDuration = animationDuration;
         this.element = null;
         
         // If points not provided, create a simple straight line
@@ -81,11 +87,46 @@ export class LightBeam {
         
         // Add some visual styling for light beam appearance
         this.element.setAttribute('stroke-linecap', 'round');
-        
+        this.element.setAttribute('stroke-linejoin', 'round');
+        this.element.setAttribute('opacity', 0.8);
+
         // Add to parent SVG
         parentSvg.appendChild(this.element);
         
+        // Apply animation if enabled
+        if (this.animated) {
+            this.animateBeamCreation();
+        }
+        
         return this.element;
+    }
+    
+    /**
+     * Animate beam creation using stroke-dasharray technique with ease-in-out timing
+     */
+    animateBeamCreation() {
+        if (!this.element) return;
+        
+        // Calculate total path length
+        const totalLength = this.element.getTotalLength();
+        
+        // Set initial state: completely hidden with dashed line
+        this.element.style.strokeDasharray = totalLength;
+        this.element.style.strokeDashoffset = totalLength;
+        
+        // Animate the stroke-dashoffset from totalLength to 0
+        this.element.animate([
+            { strokeDashoffset: totalLength },
+            { strokeDashoffset: 0 }
+        ], {
+            duration: this.animationDuration,
+            easing: 'ease-in-out',
+            fill: 'forwards'
+        }).addEventListener('finish', () => {
+            // Clean up animation styles after completion
+            this.element.style.strokeDasharray = '';
+            this.element.style.strokeDashoffset = '';
+        });
     }
     
     /**
