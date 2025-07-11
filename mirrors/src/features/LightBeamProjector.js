@@ -31,6 +31,9 @@ export class LightBeamProjector {
     castVirtualBeamToViewer({ virtualPolygon }) {
         if (!this.viewer) return;
 
+        // Store the virtual polygon for updates
+        this.lastClickedVirtualPolygon = virtualPolygon;
+
         // Clear existing beams
         this.clearVirtualBeams();
         
@@ -55,6 +58,38 @@ export class LightBeamProjector {
         });
 
         this.virtualBeams.push(virtualBeam);
+    }
+
+    /**
+     * Update virtual beams when scene elements are dragged
+     */
+    updateBeams() {
+        // Only update if we have virtual beams, a last clicked virtual polygon and a viewer
+        if (this.virtualBeams.length === 0 || !this.lastClickedVirtualPolygon || !this.viewer) return;
+
+        // Calculate new polygon center
+        const center = calculatePolygonCenter({ vertices: this.lastClickedVirtualPolygon.vertices });
+        
+        // Calculate new direction and distance to viewer
+        const direction = { x: this.viewer.x - center.x, y: this.viewer.y - center.y };
+        const normalizedDirection = normalizeVector({ vector: direction });
+        const distance = vectorLength({ vector: direction });
+        
+        // Update the existing beam's properties and path
+        const beam = this.virtualBeams[0];
+        beam.emissionPoint = center;
+        beam.directorVector = normalizedDirection;
+        beam.maxLength = distance;
+        beam.points = [
+            center,
+            {
+                x: center.x + normalizedDirection.x * distance,
+                y: center.y + normalizedDirection.y * distance
+            }
+        ];
+        
+        // Update the beam's visual path
+        beam.updateBeamPath();
     }
 
     /**

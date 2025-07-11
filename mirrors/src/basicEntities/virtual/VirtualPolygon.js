@@ -20,6 +20,8 @@ export class VirtualPolygon extends Polygon {
      * @param {boolean} [config.draggable=false] - Whether the polygon can be dragged
      * @param {boolean} [config.clickable=false] - Whether the virtual polygon can be clicked
      * @param {Function} [config.onVirtualClick] - Callback function when virtual polygon is clicked
+     * @param {Object} [config.sourcePolygon] - Reference to the real polygon this virtual polygon reflects
+     * @param {Object} [config.sourceMirror] - Reference to the mirror that creates this reflection
      */
     constructor({ 
         vertices, 
@@ -29,7 +31,9 @@ export class VirtualPolygon extends Polygon {
         parentSvg, 
         draggable = false,
         clickable = true,
-        onVirtualClick = null
+        onVirtualClick = null,
+        sourcePolygon = null,
+        sourceMirror = null
     }) {
         super({
             vertices,
@@ -42,6 +46,10 @@ export class VirtualPolygon extends Polygon {
         
         this.clickable = clickable;
         this.onVirtualClick = onVirtualClick;
+        
+        // Store source references for tracking the origin of this reflection
+        this.sourcePolygon = sourcePolygon;
+        this.sourceMirror = sourceMirror;
         
         this.applyVirtualStyling();
         

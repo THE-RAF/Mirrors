@@ -145,6 +145,7 @@ export class SimpleReflectionMode {
             if (this.isSceneBeingDragged()) {
                 this.reflectionEngine.updateReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
                 this.lightBeamEngine.updateAllLightBeamReflections({ mirrors: this.mirrors });
+                this.virtualLightCaster.updateBeams();
             }
         });
     }

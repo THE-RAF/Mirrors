@@ -20,6 +20,8 @@ export class VirtualViewer extends Viewer {
      * @param {number} [config.strokeWidth=2] - Stroke width
      * @param {SVGElement} config.parentSvg - Parent SVG container
      * @param {boolean} [config.draggable=false] - Whether the viewer can be dragged
+     * @param {Object} [config.sourceViewer] - Reference to the real viewer this virtual viewer reflects
+     * @param {Object} [config.sourceMirror] - Reference to the mirror that creates this reflection
      */
     constructor({ 
         x, 
@@ -29,7 +31,9 @@ export class VirtualViewer extends Viewer {
         stroke = '#333', 
         strokeWidth = 2, 
         parentSvg, 
-        draggable = false
+        draggable = false,
+        sourceViewer = null,
+        sourceMirror = null
     }) {
         super({
             x,
@@ -41,6 +45,10 @@ export class VirtualViewer extends Viewer {
             parentSvg,
             draggable
         });
+        
+        // Store source references for tracking the origin of this reflection
+        this.sourceViewer = sourceViewer;
+        this.sourceMirror = sourceMirror;
         
         this.applyVirtualStyling();
     }

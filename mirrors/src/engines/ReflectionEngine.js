@@ -57,7 +57,9 @@ export class ReflectionEngine {
                     strokeWidth: polygon.strokeWidth,
                     parentSvg: this.svgCanvas,
                     clickable: true,
-                    onVirtualClick: this.onVirtualPolygonClick
+                    onVirtualClick: this.onVirtualPolygonClick,
+                    sourcePolygon: polygon,
+                    sourceMirror: mirror
                 });
                 
                 this.virtualPolygons.push(virtualPolygon);
@@ -89,7 +91,9 @@ export class ReflectionEngine {
                     fill: viewer.fill,
                     stroke: viewer.stroke,
                     strokeWidth: viewer.strokeWidth,
-                    parentSvg: this.svgCanvas
+                    parentSvg: this.svgCanvas,
+                    sourceViewer: viewer,
+                    sourceMirror: mirror
                 });
                 
                 this.virtualViewers.push(virtualViewer);
@@ -105,8 +109,61 @@ export class ReflectionEngine {
      * @param {Array} config.mirrors - Array of mirror objects
      */
     updateReflections({ polygons, viewers = [], mirrors }) {
-        this.clearReflections();
-        this.createReflections({ polygons, viewers, mirrors });
+        // Update existing virtual polygons
+        this.virtualPolygons.forEach(virtualPolygon => {
+            const sourcePolygon = virtualPolygon.sourcePolygon;
+            const sourceMirror = virtualPolygon.sourceMirror;
+            
+            if (sourcePolygon && sourceMirror) {
+                // Define mirror axis from mirror coordinates
+                const axis = {
+                    x1: sourceMirror.x1,
+                    y1: sourceMirror.y1,
+                    x2: sourceMirror.x2,
+                    y2: sourceMirror.y2
+                };
+                
+                // Reflect polygon vertices
+                const reflectedVertices = reflectPolygonOverAxis({
+                    polygon: sourcePolygon.vertices,
+                    axis: axis
+                });
+                
+                // Update the virtual polygon's vertices and SVG
+                virtualPolygon.vertices = reflectedVertices;
+                virtualPolygon.updatePoints();
+            }
+        });
+
+        // Update existing virtual viewers
+        this.virtualViewers.forEach(virtualViewer => {
+            const sourceViewer = virtualViewer.sourceViewer;
+            const sourceMirror = virtualViewer.sourceMirror;
+            
+            if (sourceViewer && sourceMirror) {
+                // Define mirror axis from mirror coordinates
+                const axis = {
+                    x1: sourceMirror.x1,
+                    y1: sourceMirror.y1,
+                    x2: sourceMirror.x2,
+                    y2: sourceMirror.y2
+                };
+                
+                // Reflect viewer position (single point)
+                const reflectedPoint = reflectPolygonOverAxis({
+                    polygon: [{ x: sourceViewer.x, y: sourceViewer.y }],
+                    axis: axis
+                })[0];
+                
+                // Update the virtual viewer's position and SVG
+                virtualViewer.x = reflectedPoint.x;
+                virtualViewer.y = reflectedPoint.y;
+                if (virtualViewer.element) {
+                    virtualViewer.element.setAttribute('cx', reflectedPoint.x);
+                    virtualViewer.element.setAttribute('cy', reflectedPoint.y);
+                }
+            }
+        });
     }
 
     /**
