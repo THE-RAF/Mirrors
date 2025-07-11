@@ -3,7 +3,7 @@
  * Main exports: LightBeamEngine
  */
 
-import { LightBeam } from '../basicEntities/light/LightBeam.js';
+import { LightBeam } from '../basicEntities/real/LightBeam.js';
 import { rayToLineIntersection, reflectVectorOverAxis } from '../math/analyticalGeometry.js';
 import { distanceBetweenTwoPoints, normalizeVector } from '../math/linearAlgebra.js';
 
@@ -99,7 +99,7 @@ export class LightBeamEngine {
                 break;
             }
         }
-        
+
         return points;
     }
 
