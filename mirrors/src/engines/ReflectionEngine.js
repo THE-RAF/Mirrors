@@ -4,7 +4,7 @@
  */
 
 import { VirtualPolygon } from '../basicEntities/virtual/VirtualPolygon.js';
-import { reflectPolygonOverAxis } from '../math/reflections.js';
+import { reflectPolygonOverAxis } from '../math/analyticalGeometry.js';
 
 /**
  * @class ReflectionEngine

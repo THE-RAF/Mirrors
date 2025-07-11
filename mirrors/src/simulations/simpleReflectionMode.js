@@ -38,9 +38,13 @@ export class SimpleReflectionMode {
     init() {
         this.createPolygons();
         this.createMirrors();
-        this.lightBeamEngine.createSampleLightBeam();
+        this.lightBeamEngine.createLightBeam({
+            emissionPoint: { x: 150, y: 400 },
+            directorVector: { x: 1, y: 0 },
+            mirrors: this.mirrors,
+        });
         this.reflectionEngine.createReflections({ polygons: this.polygons, mirrors: this.mirrors });
-        this.setupReflectionUpdates();
+        this.setupSceneUpdates();
     }
 
     /**
@@ -60,13 +64,14 @@ export class SimpleReflectionMode {
     }
 
     /**
-     * Set up efficient reflection updating during polygon dragging
+     * Set up efficient scene updating during dragging
      */
-    setupReflectionUpdates() {
+    setupSceneUpdates() {
         document.addEventListener('mousemove', () => {
             // Check if any real scene element is being dragged
             if (this.isSceneBeingDragged()) {
                 this.reflectionEngine.updateReflections({ polygons: this.polygons, mirrors: this.mirrors });
+                this.lightBeamEngine.updateAllLightBeamReflections({ mirrors: this.mirrors });
             }
         });
     }
