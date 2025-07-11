@@ -1,7 +1,11 @@
 # LLM Behavior Guidelines: Code Simplicity
 
 ## Core Principles
-Simple, clean code that's easy to understand and maintain.
+Simple, clean code that's easy to understand and maintain
+
+### ALWAYS:
+- Re-read this document after summarizing conversation history (for LLM context)
+- Re-read the project folder and file structure after summarizing conversation history (for LLM context)
 
 ## Code Guidelines
 

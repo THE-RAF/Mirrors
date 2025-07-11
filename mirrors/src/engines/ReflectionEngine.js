@@ -15,11 +15,13 @@ export class ReflectionEngine {
     /**
      * @param {Object} config
      * @param {SVGElement} config.svgCanvas - SVG element for rendering virtual objects
+     * @param {Function} [config.onVirtualPolygonClick] - Callback for virtual polygon clicks
      */
-    constructor({ svgCanvas }) {
+    constructor({ svgCanvas, onVirtualPolygonClick = null }) {
         this.svgCanvas = svgCanvas;
         this.virtualPolygons = [];
         this.virtualViewers = [];
+        this.onVirtualPolygonClick = onVirtualPolygonClick;
     }
 
     /**
@@ -51,7 +53,11 @@ export class ReflectionEngine {
                 const virtualPolygon = new VirtualPolygon({
                     vertices: reflectedVertices,
                     fill: polygon.fill,
-                    parentSvg: this.svgCanvas
+                    stroke: polygon.stroke,
+                    strokeWidth: polygon.strokeWidth,
+                    parentSvg: this.svgCanvas,
+                    clickable: true,
+                    onVirtualClick: this.onVirtualPolygonClick
                 });
                 
                 this.virtualPolygons.push(virtualPolygon);

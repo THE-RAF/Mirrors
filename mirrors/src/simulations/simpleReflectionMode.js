@@ -8,6 +8,7 @@ import { Mirror } from '../basicEntities/real/Mirror.js';
 import { Viewer } from '../basicEntities/real/Viewer.js';
 import { ReflectionEngine } from '../engines/ReflectionEngine.js';
 import { LightBeamEngine } from '../engines/LightBeamEngine.js';
+import { LightBeamProjector } from '../features/LightBeamProjector.js';
 
 /**
  * @class SimpleReflectionMode
@@ -32,8 +33,16 @@ export class SimpleReflectionMode {
         this.viewers = [];
         
         // Initialize engines
-        this.reflectionEngine = new ReflectionEngine({ svgCanvas });
+        this.reflectionEngine = new ReflectionEngine({ 
+            svgCanvas,
+            onVirtualPolygonClick: (virtualPolygon, event) => {
+                this.handleVirtualPolygonClick({ virtualPolygon });
+            }
+        });
         this.lightBeamEngine = new LightBeamEngine({ svgCanvas });
+        
+        // Initialize virtual light caster (will be set after viewers are created)
+        this.virtualLightCaster = null;
     }
     
     /**
@@ -44,6 +53,7 @@ export class SimpleReflectionMode {
         this.createMirrorsFromConfig();
         this.createViewersFromConfig();
         this.createLightBeamsFromConfig();
+        this.createVirtualLightCaster();
         this.reflectionEngine.createReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
         this.setupSceneUpdates();
     }
@@ -117,6 +127,16 @@ export class SimpleReflectionMode {
     }
 
     /**
+     * Create virtual light caster
+     */
+    createVirtualLightCaster() {
+        this.virtualLightCaster = new LightBeamProjector({
+            svgCanvas: this.svgCanvas,
+            viewer: this.viewers[0]
+        });
+    }
+
+    /**
      * Set up efficient scene updating during dragging
      */
     setupSceneUpdates() {
@@ -147,19 +167,31 @@ export class SimpleReflectionMode {
     }
 
     /**
+     * Handle virtual polygon click
+     * @param {Object} config
+     * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
+     */
+    handleVirtualPolygonClick({ virtualPolygon }) {
+        this.virtualLightCaster.castVirtualBeamToViewer({ virtualPolygon });
+    }
+
+    /**
      * Clean up all simulation resources
      */
     destroy() {
-        // Destroy all polygons
+        // Destroy all entities
         this.polygons.forEach(polygon => polygon.destroy());
-        this.polygons = [];
-
-        // Destroy all mirrors
         this.mirrors.forEach(mirror => mirror.destroy());
-        this.mirrors = [];
+        this.viewers.forEach(viewer => viewer.destroy());
         
-        // Destroy engines and all their managed objects
+        // Destroy engines and virtual light caster
         this.reflectionEngine.destroy();
         this.lightBeamEngine.destroy();
+        this.virtualLightCaster.clearVirtualBeams();
+        
+        // Clear arrays
+        this.polygons = [];
+        this.mirrors = [];
+        this.viewers = [];
     }
 }
