@@ -114,3 +114,21 @@ export function reflectPolygonOverAxis({ polygon, axis }) {
         })
     );
 }
+
+/**
+ * Calculate the center point of a polygon
+ * @param {Object} config
+ * @param {Array} config.vertices - Array of {x, y} points
+ * @returns {Object} Center point {x, y}
+ */
+export function calculatePolygonCenter({ vertices }) {
+    const sum = vertices.reduce((acc, vertex) => ({
+        x: acc.x + vertex.x,
+        y: acc.y + vertex.y
+    }), { x: 0, y: 0 });
+
+    return {
+        x: sum.x / vertices.length,
+        y: sum.y / vertices.length
+    };
+}
