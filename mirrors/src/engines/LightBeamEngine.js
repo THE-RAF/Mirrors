@@ -5,7 +5,7 @@
 
 import { LightBeam } from '../basicEntities/light/LightBeam.js';
 import { rayToLineIntersection, reflectVectorOverAxis } from '../math/analyticalGeometry.js';
-import { distanceBetweenTwoPoints } from '../math/linearAlgebra.js';
+import { distanceBetweenTwoPoints, normalizeVector } from '../math/linearAlgebra.js';
 
 /**
  * @class LightBeamEngine
@@ -114,11 +114,7 @@ export class LightBeamEngine {
      */
     updateLightBeamReflections({ lightBeam, emissionPoint, directorVector, mirrors = [], maxLength = 800 }) {
         // Normalize the director vector
-        const length = Math.sqrt(directorVector.x * directorVector.x + directorVector.y * directorVector.y);
-        const normalizedVector = {
-            x: directorVector.x / length,
-            y: directorVector.y / length
-        };
+        const normalizedVector = normalizeVector({ vector: directorVector });
 
         // Calculate new path
         const points = this.calculateReflectionPath({
@@ -137,18 +133,19 @@ export class LightBeamEngine {
      * Update all light beam reflections based on current mirror positions
      * @param {Object} config
      * @param {Array} config.mirrors - Array of mirror objects
-     * TODO: Store light beam parameters for proper updating
      */
     updateAllLightBeamReflections({ mirrors = [] }) {
-        // For now, update all light beams with hardcoded parameters
-        // TODO: Store emission point and direction with each light beam for proper updating
+        // Update each light beam using its stored emission parameters
         this.lightBeams.forEach(lightBeam => {
-            this.updateLightBeamReflections({
-                lightBeam,
-                emissionPoint: { x: 150, y: 400 },
-                directorVector: { x: 1, y: 0 },
-                mirrors
-            });
+            if (lightBeam.emissionPoint && lightBeam.directorVector) {
+                this.updateLightBeamReflections({
+                    lightBeam,
+                    emissionPoint: lightBeam.emissionPoint,
+                    directorVector: lightBeam.directorVector,
+                    mirrors,
+                    maxLength: lightBeam.maxLength
+                });
+            }
         });
     }
 
@@ -199,11 +196,7 @@ export class LightBeamEngine {
         maxLength = 800 
     }) {
         // Normalize the director vector
-        const length = Math.sqrt(directorVector.x * directorVector.x + directorVector.y * directorVector.y);
-        const normalizedVector = {
-            x: directorVector.x / length,
-            y: directorVector.y / length
-        };
+        const normalizedVector = normalizeVector({ vector: directorVector });
 
         // Calculate reflection path
         const points = this.calculateReflectionPath({
@@ -214,7 +207,10 @@ export class LightBeamEngine {
         });
 
         const lightBeam = new LightBeam({
-            points,
+            emissionPoint,
+            directorVector: normalizedVector,
+            maxLength,
+            points, // Pass calculated points
             stroke,
             strokeWidth,
             parentSvg: this.svgCanvas

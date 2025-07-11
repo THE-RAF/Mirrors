@@ -10,23 +10,48 @@
 export class LightBeam {
     /**
      * @param {Object} config
-     * @param {Array} config.points - Array of {x, y} points defining the light beam path
+     * @param {Object} config.emissionPoint - Starting point {x, y} for ray tracing
+     * @param {Object} config.directorVector - Direction vector {x, y} for ray tracing
+     * @param {number} [config.maxLength=800] - Maximum ray length for ray tracing
+     * @param {Array} [config.points] - Array of {x, y} points defining the light beam path (calculated if not provided)
      * @param {string} [config.stroke='#ffff00'] - Stroke color of the light beam
      * @param {number} [config.strokeWidth=2] - Stroke width of the light beam
      * @param {SVGElement} config.parentSvg - Parent SVG container
      */
     constructor({ 
-        points, 
+        emissionPoint,
+        directorVector,
+        maxLength = 800,
+        points = null,
         stroke = '#f5e911', 
         strokeWidth = 2, 
         parentSvg 
     }) {
-        this.points = points;
+        this.emissionPoint = emissionPoint;
+        this.directorVector = directorVector;
+        this.maxLength = maxLength;
         this.stroke = stroke;
         this.strokeWidth = strokeWidth;
         this.element = null;
         
+        // If points not provided, create a simple straight line
+        this.points = points || this.createDefaultPoints();
+        
         this.createSvg({ parentSvg });
+    }
+    
+    /**
+     * Create default points as a straight line from emission point in director vector direction
+     * @returns {Array} Array of two points defining a straight line
+     */
+    createDefaultPoints() {
+        return [
+            this.emissionPoint,
+            {
+                x: this.emissionPoint.x + this.directorVector.x * this.maxLength,
+                y: this.emissionPoint.y + this.directorVector.y * this.maxLength
+            }
+        ];
     }
     
     /**
