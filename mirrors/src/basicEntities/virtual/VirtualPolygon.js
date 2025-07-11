@@ -18,6 +18,8 @@ export class VirtualPolygon extends Polygon {
      * @param {number} [config.strokeWidth=1] - Stroke width
      * @param {SVGElement} config.parentSvg - Parent SVG container
      * @param {boolean} [config.draggable=false] - Whether the polygon can be dragged
+     * @param {boolean} [config.clickable=false] - Whether the virtual polygon can be clicked
+     * @param {Function} [config.onVirtualClick] - Callback function when virtual polygon is clicked
      */
     constructor({ 
         vertices, 
@@ -25,7 +27,9 @@ export class VirtualPolygon extends Polygon {
         stroke = '#333', 
         strokeWidth = 2, 
         parentSvg, 
-        draggable = false 
+        draggable = false,
+        clickable = false,
+        onVirtualClick = null
     }) {
         super({
             vertices,
@@ -36,7 +40,14 @@ export class VirtualPolygon extends Polygon {
             draggable
         });
         
+        this.clickable = clickable;
+        this.onVirtualClick = onVirtualClick;
+        
         this.applyVirtualStyling();
+        
+        if (this.clickable) {
+            this.setupClickHandler();
+        }
     }
     
     /**
@@ -50,5 +61,69 @@ export class VirtualPolygon extends Polygon {
         
         // Reduce opacity for virtual appearance
         this.element.setAttribute('opacity', '0.5');
+        
+        // Add visual feedback for clickable virtual polygons
+        if (this.clickable) {
+            this.element.style.cursor = 'pointer';
+        }
+    }
+    
+    /**
+     * Set up click event handler for virtual polygon
+     */
+    setupClickHandler() {
+        if (!this.element) return;
+        
+        this.element.addEventListener('click', (event) => {
+            event.stopPropagation();
+            
+            // Visual feedback on click
+            this.animateClick();
+            
+            // Call the callback if provided
+            if (this.onVirtualClick) {
+                this.onVirtualClick(this, event);
+            }
+            
+            console.log('Virtual polygon clicked:', this);
+        });
+        
+        // Add hover effects for better UX
+        this.element.addEventListener('mouseenter', () => {
+            if (this.clickable) {
+                this.element.setAttribute('opacity', '0.8');
+            }
+        });
+        
+        this.element.addEventListener('mouseleave', () => {
+            if (this.clickable) {
+                this.element.setAttribute('opacity', '0.6');
+            }
+        });
+    }
+    
+    /**
+     * Animate click feedback
+     */
+    animateClick() {
+        if (!this.element) return;
+        
+        // Brief scale animation for click feedback
+        const originalTransform = this.element.getAttribute('transform') || '';
+        
+        // Get polygon center for scaling origin
+        const bbox = this.element.getBBox();
+        const centerX = bbox.x + bbox.width / 2;
+        const centerY = bbox.y + bbox.height / 2;
+        
+        // Animate scale up and down
+        this.element.animate([
+            { transform: `${originalTransform} scale(1)`, transformOrigin: `${centerX}px ${centerY}px` },
+            { transform: `${originalTransform} scale(1.1)`, transformOrigin: `${centerX}px ${centerY}px` },
+            { transform: `${originalTransform} scale(1)`, transformOrigin: `${centerX}px ${centerY}px` }
+        ], {
+            duration: 200,
+            easing: 'ease-in-out'
+        });
     }
 }
