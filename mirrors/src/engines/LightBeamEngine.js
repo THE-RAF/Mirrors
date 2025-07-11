@@ -5,6 +5,7 @@
 
 import { LightBeam } from '../basicEntities/light/LightBeam.js';
 import { rayToLineIntersection, reflectVectorOverAxis } from '../math/analyticalGeometry.js';
+import { distanceBetweenTwoPoints } from '../math/linearAlgebra.js';
 
 /**
  * @class LightBeamEngine
@@ -21,16 +22,20 @@ export class LightBeamEngine {
     }
 
     /**
-     * Calculate light beam path with reflections
+     * Calculate light beam path with reflections off mirrors
+     * 
+     * Ray tracing algorithm: starts from emission point, finds nearest mirror intersection,
+     * reflects off mirror, and repeats until max reflections or no more intersections.
+     * 
      * @param {Object} config
      * @param {Object} config.emissionPoint - Starting point {x, y}
      * @param {Object} config.directorVector - Direction vector {x, y} (normalized)
      * @param {Array} config.mirrors - Array of mirror objects
      * @param {number} [config.maxLength=800] - Maximum ray length
+     * @param {number} [config.maxReflections=10] - Maximum number of reflections
      * @returns {Array} Array of points defining the light beam path
      */
-    calculateReflectionPath({ emissionPoint, directorVector, mirrors = [], maxLength = 800 }) {
-        
+    calculateReflectionPath({ emissionPoint, directorVector, mirrors = [], maxLength = 800, maxReflections = 10 }) {
         // Find the closest mirror intersection for a ray
         function findClosestIntersection(rayStart, rayDirection, mirrors) {
             let closestIntersection = null;
@@ -45,8 +50,9 @@ export class LightBeamEngine {
                 });
                 
                 if (intersection) {
-                    const distance = calculateDistance(intersection, rayStart);
+                    const distance = distanceBetweenTwoPoints({ point1: intersection, point2: rayStart });
                     
+                    // Only consider intersections closer than previous ones and far enough to avoid self-intersection
                     if (distance < closestDistance && distance > 0.1) {
                         closestDistance = distance;
                         closestIntersection = intersection;
@@ -58,15 +64,7 @@ export class LightBeamEngine {
             return { intersection: closestIntersection, distance: closestDistance, mirror: closestMirror };
         }
         
-        // Calculate distance between two points
-        function calculateDistance(point1, point2) {
-            return Math.sqrt(
-                (point1.x - point2.x) ** 2 + 
-                (point1.y - point2.y) ** 2
-            );
-        }
-        
-        // Add final point when no more intersections
+        // Calculate final point when no more intersections are found
         function addFinalPoint(currentPoint, currentDirection, remainingLength) {
             return {
                 x: currentPoint.x + currentDirection.x * remainingLength,
@@ -74,30 +72,29 @@ export class LightBeamEngine {
             };
         }
         
-        // Main ray tracing loop
+        // Initialize ray tracing state
         const points = [emissionPoint];
         let currentPoint = emissionPoint;
         let currentDirection = directorVector;
         let remainingLength = maxLength;
-        
-        // Allow up to 10 reflections
-        for (let i = 0; i < 10 && remainingLength > 0; i++) {
+
+        // Main ray tracing loop
+        for (let i = 0; i < maxReflections && remainingLength > 0; i++) {
             const { intersection, distance, mirror } = findClosestIntersection(currentPoint, currentDirection, mirrors);
             
             if (intersection && distance <= remainingLength) {
-                // Add intersection point
+                // Add intersection point and reflect
                 points.push(intersection);
-                
-                // Reflect direction
                 currentDirection = reflectVectorOverAxis({
                     vector: currentDirection,
                     axis: { x1: mirror.x1, y1: mirror.y1, x2: mirror.x2, y2: mirror.y2 }
                 });
                 
+                // Update ray state for next iteration
                 currentPoint = intersection;
                 remainingLength -= distance;
             } else {
-                // No more intersections, add final point
+                // No more intersections - add final point and exit
                 points.push(addFinalPoint(currentPoint, currentDirection, remainingLength));
                 break;
             }

@@ -38,3 +38,16 @@ export function vectorLength({ vector }) {
 export function dotProduct({ v1, v2 }) {
     return v1.x * v2.x + v1.y * v2.y;
 }
+
+/**
+ * Calculate the distance between two points
+ * @param {Object} config
+ * @param {Object} config.point1 - First point {x, y}
+ * @param {Object} config.point2 - Second point {x, y}
+ * @returns {number} Distance between the two points
+ */
+export function distanceBetweenTwoPoints({ point1, point2 }) {
+    const dx = point1.x - point2.x;
+    const dy = point1.y - point2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
