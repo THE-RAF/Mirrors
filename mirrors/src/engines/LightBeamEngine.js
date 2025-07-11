@@ -170,7 +170,7 @@ export class LightBeamEngine {
      * @param {Object} config.emissionPoint - Starting point {x, y}
      * @param {Object} config.directorVector - Direction vector {x, y} (will be normalized)
      * @param {Array} config.mirrors - Array of mirror objects
-     * @param {string} [config.stroke='#ffff00'] - Beam color
+     * @param {string} [config.strokeColor='#ffff00'] - Beam color
      * @param {number} [config.strokeWidth=2] - Beam width
      * @param {number} [config.maxLength=800] - Maximum ray length
      * @param {boolean} [config.animated=true] - Whether to animate beam creation
@@ -181,7 +181,7 @@ export class LightBeamEngine {
         emissionPoint, 
         directorVector, 
         mirrors = [], 
-        stroke = '#ffdd00', 
+        strokeColor = '#ffdd00', 
         strokeWidth = 2, 
         maxLength = 800,
         animated = true,
@@ -203,7 +203,7 @@ export class LightBeamEngine {
             directorVector: normalizedVector,
             maxLength,
             points, // Pass calculated points
-            stroke,
+            strokeColor,
             strokeWidth,
             animated,
             animationDuration,

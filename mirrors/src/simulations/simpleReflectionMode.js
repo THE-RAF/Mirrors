@@ -85,7 +85,7 @@ export class SimpleReflectionMode {
                 emissionPoint: beamConfig.emissionPoint,
                 directorVector: beamConfig.directorVector,
                 maxLength: beamConfig.maxLength || 800,
-                stroke: beamConfig.stroke || '#ffdd00',
+                strokeColor: beamConfig.strokeColor || '#ffdd00',
                 strokeWidth: beamConfig.strokeWidth || 2,
                 animated: beamConfig.animated ?? true,
                 animationDuration: beamConfig.animationDuration || 1000,

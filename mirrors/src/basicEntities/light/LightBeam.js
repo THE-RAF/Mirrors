@@ -14,7 +14,7 @@ export class LightBeam {
      * @param {Object} config.directorVector - Direction vector {x, y} for ray tracing
      * @param {number} [config.maxLength=800] - Maximum ray length for ray tracing
      * @param {Array} [config.points] - Array of {x, y} points defining the light beam path (calculated if not provided)
-     * @param {string} [config.stroke='#ffff00'] - Stroke color of the light beam
+     * @param {string} [config.strokeColor='#ffff00'] - Stroke color of the light beam
      * @param {number} [config.strokeWidth=2] - Stroke width of the light beam
      * @param {boolean} [config.animated=true] - Whether to animate beam creation
      * @param {number} [config.animationDuration=1000] - Duration of creation animation in milliseconds
@@ -25,7 +25,7 @@ export class LightBeam {
         directorVector,
         maxLength = 800,
         points = null,
-        stroke = '#f5e911', 
+        strokeColor = '#f5e911', 
         strokeWidth = 2,
         animated = true,
         animationDuration = 1000,
@@ -34,7 +34,7 @@ export class LightBeam {
         this.emissionPoint = emissionPoint;
         this.directorVector = directorVector;
         this.maxLength = maxLength;
-        this.stroke = stroke;
+        this.strokeColor = strokeColor;
         this.strokeWidth = strokeWidth;
         this.animated = animated;
         this.animationDuration = animationDuration;
@@ -84,7 +84,7 @@ export class LightBeam {
         
         // Set polyline attributes
         this.element.setAttribute('points', pointsString);
-        this.element.setAttribute('stroke', this.stroke);
+        this.element.setAttribute('stroke', this.strokeColor);
         this.element.setAttribute('stroke-width', this.strokeWidth);
         this.element.setAttribute('fill', 'none');
         

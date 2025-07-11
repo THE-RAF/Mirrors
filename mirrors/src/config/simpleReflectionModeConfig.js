@@ -42,7 +42,7 @@ export const sceneEntities = {
             emissionPoint: { x: 150, y: 400 },
             directorVector: { x: 1, y: 0 },
             maxLength: 800,
-            stroke: '#ffdd00',
+            strokeColor: '#ffdd00',
             strokeWidth: 2,
             animated: true,
             animationDuration: 1000
@@ -52,7 +52,7 @@ export const sceneEntities = {
             emissionPoint: { x: 200, y: 500 },
             directorVector: { x: 0.8, y: -0.6 },
             maxLength: 600,
-            stroke: '#00ff88',
+            strokeColor: '#00ff88',
             strokeWidth: 2,
             animated: true,
             animationDuration: 1000
