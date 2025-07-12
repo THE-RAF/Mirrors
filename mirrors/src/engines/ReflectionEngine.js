@@ -16,12 +16,14 @@ export class ReflectionEngine {
      * @param {Object} config
      * @param {SVGElement} config.svgCanvas - SVG element for rendering virtual objects
      * @param {Function} [config.onVirtualPolygonClick] - Callback for virtual polygon clicks
+     * @param {boolean} [config.virtualPolygonsClickable=true] - Whether virtual polygons should be clickable
      */
-    constructor({ svgCanvas, onVirtualPolygonClick = null }) {
+    constructor({ svgCanvas, onVirtualPolygonClick = null, virtualPolygonsClickable = true }) {
         this.svgCanvas = svgCanvas;
         this.virtualPolygons = [];
         this.virtualViewers = [];
         this.onVirtualPolygonClick = onVirtualPolygonClick;
+        this.virtualPolygonsClickable = virtualPolygonsClickable;
     }
 
     /**
@@ -56,7 +58,7 @@ export class ReflectionEngine {
                     stroke: polygon.stroke,
                     strokeWidth: polygon.strokeWidth,
                     parentSvg: this.svgCanvas,
-                    clickable: true,
+                    clickable: this.virtualPolygonsClickable,
                     onVirtualClick: this.onVirtualPolygonClick,
                     sourcePolygon: polygon,
                     sourceMirror: mirror

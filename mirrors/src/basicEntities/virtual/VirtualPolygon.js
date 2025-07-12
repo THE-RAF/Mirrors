@@ -30,7 +30,7 @@ export class VirtualPolygon extends Polygon {
         strokeWidth = 2, 
         parentSvg, 
         draggable = false,
-        clickable = true,
+        clickable = false,
         onVirtualClick = null,
         sourcePolygon = null,
         sourceMirror = null

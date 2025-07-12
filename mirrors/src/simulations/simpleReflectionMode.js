@@ -40,7 +40,8 @@ export class SimpleReflectionMode {
             svgCanvas: this.virtualLayer,  // Virtual objects go to virtual layer
             onVirtualPolygonClick: (virtualPolygon, event) => {
                 this.handleVirtualPolygonClick({ virtualPolygon });
-            }
+            },
+            virtualPolygonsClickable: this.modeConfig.lightBeamProjector.enabled
         });
         this.lightBeamEngine = new LightBeamEngine({ svgCanvas: this.beamLayer });
         
@@ -153,16 +154,20 @@ export class SimpleReflectionMode {
     }
 
     /**
-     * Create light beam projector
+     * Create light beam projector (if enabled in config)
      */
     createLightBeamProjector() {
-        this.virtualLightCaster = new LightBeamProjector({
-            svgCanvas: this.beamLayer,
-            viewer: this.viewers[0],
-            lightBeamEngine: this.lightBeamEngine,
-            mirrors: this.mirrors,
-            beamConfig: this.modeConfig.lightBeamProjectorConfig
-        });
+        if (this.modeConfig.lightBeamProjector.enabled) {
+            this.virtualLightCaster = new LightBeamProjector({
+                svgCanvas: this.beamLayer,
+                viewer: this.viewers[0],
+                lightBeamEngine: this.lightBeamEngine,
+                mirrors: this.mirrors,
+                beamConfig: this.modeConfig.lightBeamProjector.config
+            });
+        } else {
+            this.virtualLightCaster = null;
+        }
     }
 
     /**
@@ -180,7 +185,12 @@ export class SimpleReflectionMode {
                 requestAnimationFrame(() => {
                     this.reflectionEngine.updateReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
                     this.lightBeamEngine.updateAllLightBeamReflections({ mirrors: this.mirrors });
-                    this.virtualLightCaster.updateAllProjections();
+                    
+                    // Only update projections if projector is enabled
+                    if (this.virtualLightCaster) {
+                        this.virtualLightCaster.updateAllProjections();
+                    }
+                    
                     updateScheduled = false;
                 });
             }
@@ -210,7 +220,9 @@ export class SimpleReflectionMode {
      * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
      */
     handleVirtualPolygonClick({ virtualPolygon }) {
-        this.virtualLightCaster.handleVirtualPolygonClick({ virtualPolygon });
+        if (this.virtualLightCaster) {
+            this.virtualLightCaster.handleVirtualPolygonClick({ virtualPolygon });
+        }
     }
 
     /**
@@ -222,10 +234,13 @@ export class SimpleReflectionMode {
         this.mirrors.forEach(mirror => mirror.destroy());
         this.viewers.forEach(viewer => viewer.destroy());
         
-        // Destroy engines and virtual light caster
+        // Destroy engines and virtual light caster (if exists)
         this.reflectionEngine.destroy();
         this.lightBeamEngine.destroy();
-        this.virtualLightCaster.clearVirtualBeams();
+        
+        if (this.virtualLightCaster) {
+            this.virtualLightCaster.clearAllProjections();
+        }
         
         // Clean up SVG layers
         if (this.beamLayer?.parentNode) {

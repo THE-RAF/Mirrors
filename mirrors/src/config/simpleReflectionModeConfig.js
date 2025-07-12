@@ -10,17 +10,20 @@ export const modeConfig = {
         draggableMirrors: true,
         draggableViewers: true
     },
-    lightBeamProjectorConfig: {
-        virtualBeam: {
-            color: '#fa6c00',
-            strokeWidth: 2,
-            animationDuration: 1000,
-            tolerance: 10 // px tolerance for endpoint validation
-        },
-        realBeam: {
-            color: '#ffdd00',
-            strokeWidth: 2,
-            animationDuration: 1000
+    lightBeamProjector: {
+        enabled: true, // Toggle light beam projector on/off
+        config: {
+            virtualBeam: {
+                color: '#fa6c00',
+                strokeWidth: 2,
+                animationDuration: 1000,
+                tolerance: 10 // px tolerance for endpoint validation
+            },
+            realBeam: {
+                color: '#ffdd00',
+                strokeWidth: 2,
+                animationDuration: 1000
+            }
         }
     }
 };
