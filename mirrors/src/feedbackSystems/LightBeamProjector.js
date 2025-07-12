@@ -62,6 +62,15 @@ export class LightBeamProjector {
     // ============================================
 
     /**
+     * Handle virtual polygon click events
+     * @param {Object} config
+     * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
+     */
+    handleVirtualPolygonClick({ virtualPolygon }) {
+        this.castRealAndVirtualProjections({ virtualPolygon });
+    }
+
+    /**
      * Cast both real and virtual projections from virtual polygon to the viewer
      * Only casts projections if the reflection is valid (endpoint matches viewer)
      * @param {Object} config
@@ -143,6 +152,7 @@ export class LightBeamProjector {
         };
         
         const virtualProjection = new VirtualLightBeam(virtualProjectionConfig);
+        virtualProjection.sourceVirtualPolygon = virtualPolygon;
         this.virtualProjections.push(virtualProjection);
     }
 
@@ -228,6 +238,7 @@ export class LightBeamProjector {
             animationDuration: this.beamConfig.realBeam.animationDuration,
             mirrors: this.mirrors
         });
+        realProjection.sourceVirtualPolygon = virtualPolygon;
         this.realProjections.push(realProjection);
     }
 
