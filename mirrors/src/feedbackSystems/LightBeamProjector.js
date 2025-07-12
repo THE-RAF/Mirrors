@@ -1,6 +1,8 @@
 /**
- * @file LightBeamProjector.js - Handles casting light beams from polygon interactions
+ * @file LightBeamProjector.js - Compatibility wrapper for the modular projection system
  * Main exports: LightBeamProjector
+ * 
+ * DEPRECATED: This is a compatibility wrapper. Use ModularLightBeamProjector for new projects.
  * 
  * TERMINOLOGY:
  * - Virtual Projection: Light beam projected from a virtual polygon directly to the viewer
@@ -8,13 +10,14 @@
  * - Projections are the specific light beams that connect polygons to the viewer when clicked
  */
 
-import { VirtualLightBeam } from '../basicEntities/virtual/VirtualLightBeam.js';
-import { calculatePolygonCenter } from '../math/analyticalGeometry.js';
-import { normalizeVector, vectorLength } from '../math/linearAlgebra.js';
+import { ModularLightBeamProjector } from './ModularLightBeamProjector.js';
 
 /**
  * @class LightBeamProjector
- * Projects light beams from virtual polygons to the viewer when clicked
+ * Compatibility wrapper for ModularLightBeamProjector
+ * Maintains the original API while delegating to the new modular system
+ * 
+ * @deprecated Use ModularLightBeamProjector directly for new projects
  */
 export class LightBeamProjector {
     /**
@@ -26,398 +29,159 @@ export class LightBeamProjector {
      * @param {Object} config.beamConfig - Beam appearance and behavior configuration
      */
     constructor({ svgCanvas, viewer, lightBeamEngine, mirrors, beamConfig }) {
+        // Delegate to the new modular system
+        this.modularProjector = new ModularLightBeamProjector({
+            svgCanvas,
+            viewer,
+            lightBeamEngine,
+            mirrors,
+            beamConfig
+        });
+        
+        // Maintain compatibility properties for legacy code
         this.svgCanvas = svgCanvas;
         this.viewer = viewer;
         this.lightBeamEngine = lightBeamEngine;
         this.mirrors = mirrors;
-        this.beamConfig = this.initializeBeamConfig(beamConfig);
-        this.virtualProjections = [];
-        this.realProjections = [];
+        this.beamConfig = this.modularProjector.beamConfig;
+        
+        // Legacy state properties (now computed from modular system)
         this.lastClickedVirtualPolygon = null;
     }
 
-    /**
-     * Initialize beam configuration with defaults
-     * @param {Object|undefined} beamConfig - User-provided beam configuration
-     * @returns {Object} Complete beam configuration with defaults
-     */
-    initializeBeamConfig(beamConfig) {
-        return {
-            virtualBeam: {
-                color: beamConfig?.virtualBeam?.color || '#fa6c00',
-                strokeWidth: beamConfig?.virtualBeam?.strokeWidth || 2,
-                animationDuration: beamConfig?.virtualBeam?.animationDuration || 1000,
-                tolerance: beamConfig?.virtualBeam?.tolerance || 10
-            },
-            realBeam: {
-                color: beamConfig?.realBeam?.color || '#ffdd00',
-                strokeWidth: beamConfig?.realBeam?.strokeWidth || 2,
-                animationDuration: beamConfig?.realBeam?.animationDuration || 1000
-            }
-        };
-    }
-
     // ============================================
-    // PUBLIC INTERFACE
+    // LEGACY COMPATIBILITY INTERFACE
     // ============================================
 
     /**
-     * Handle virtual polygon click events
+     * Handle virtual polygon click events (legacy method)
      * @param {Object} config
      * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
      */
     handleVirtualPolygonClick({ virtualPolygon }) {
-        this.castRealAndVirtualProjections({ virtualPolygon });
+        this.lastClickedVirtualPolygon = virtualPolygon;
+        this.modularProjector.handleVirtualPolygonClick({ virtualPolygon });
     }
 
     /**
-     * Cast both real and virtual projections from virtual polygon to the viewer
-     * Only casts projections if the reflection is valid (endpoint matches viewer)
+     * Cast both real and virtual projections (legacy method)
      * @param {Object} config
      * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
      */
     castRealAndVirtualProjections({ virtualPolygon }) {
-        if (!this.viewer) return;
-
         this.lastClickedVirtualPolygon = virtualPolygon;
-        this.clearAllBeams();
         
-        // Only cast beams if reflection is valid
-        if (this.isProjectionEndpointAtViewer({ virtualPolygon })) {
-            this.castVirtualProjection({ virtualPolygon });
-            this.castRealProjection({ virtualPolygon });
+        if (this.modularProjector.isValidProjection({ virtualPolygon })) {
+            this.modularProjector.createProjections({ virtualPolygon });
         }
     }
 
     /**
-     * Update both virtual and real beams when scene elements are dragged
-     * Only updates beams if the reflection is still valid, clears them otherwise
+     * Update beams (legacy method name)
      */
     updateBeams() {
-        if (!this.lastClickedVirtualPolygon || !this.viewer) return;
-
-        // Check if reflection is still valid after dragging
-        if (this.isProjectionEndpointAtViewer({ virtualPolygon: this.lastClickedVirtualPolygon })) {
-            this.updateVirtualProjection();
-            this.updateRealProjection();
-        } else {
-            // Clear beams if reflection is no longer valid
-            this.clearAllBeams();
-        }
+        this.modularProjector.updateAllProjections();
     }
 
     /**
-     * Clear all beams (both virtual and real)
+     * Clear all beams (legacy method name)
      */
     clearAllBeams() {
-        this.clearVirtualProjections();
-        this.clearRealBeams();
+        this.modularProjector.clearAllProjections();
+        this.lastClickedVirtualPolygon = null;
     }
 
     // ============================================
-    // VIRTUAL BEAM METHODS
+    // LEGACY PROPERTY ACCESS
     // ============================================
 
     /**
-     * Cast a virtual projection from virtual polygon to viewer
-     * @param {Object} config
-     * @param {VirtualPolygon} config.virtualPolygon - The virtual polygon
+     * Get virtual projections (legacy compatibility)
+     * @returns {Array} Array of virtual projection objects
      */
+    get virtualProjections() {
+        return this.modularProjector.getVirtualManager().getAllProjections();
+    }
+
+    /**
+     * Get real projections (legacy compatibility)
+     * @returns {Array} Array of real projection objects
+     */
+    get realProjections() {
+        return this.modularProjector.getRealManager().getAllProjections();
+    }
+
+    // ============================================
+    // NEW METHODS (pass-through to modular system)
+    // ============================================
+
+    /**
+     * Update all projections (new method name)
+     */
+    updateAllProjections() {
+        this.modularProjector.updateAllProjections();
+    }
+
+    /**
+     * Clear all projections (new method name)
+     */
+    clearAllProjections() {
+        this.modularProjector.clearAllProjections();
+        this.lastClickedVirtualPolygon = null;
+    }
+
+    /**
+     * Check if projections exist for a polygon
+     * @param {Object} config
+     * @param {Object} config.virtualPolygon - The virtual polygon
+     * @returns {boolean} True if projections exist
+     */
+    hasProjections({ virtualPolygon }) {
+        return this.modularProjector.hasProjections({ virtualPolygon });
+    }
+
+    /**
+     * Get projection statistics
+     * @returns {Object} Projection statistics
+     */
+    getProjectionStats() {
+        return this.modularProjector.getProjectionStats();
+    }
+
+    /**
+     * Access the underlying modular projector
+     * @returns {ModularLightBeamProjector} The modular projector instance
+     */
+    getModularProjector() {
+        return this.modularProjector;
+    }
+
+    // ============================================
+    // LEGACY METHODS (maintained for compatibility but deprecated)
+    // ============================================
+
     castVirtualProjection({ virtualPolygon }) {
-        this.clearVirtualProjections();
-
-        // Calculate emission point (center of virtual polygon)
-        const virtualPolygonCenter = calculatePolygonCenter({ vertices: virtualPolygon.vertices });
-        
-        // Calculate direction vector from polygon to viewer
-        const polygonToViewerDirection = { 
-            x: this.viewer.x - virtualPolygonCenter.x, 
-            y: this.viewer.y - virtualPolygonCenter.y 
-        };
-        const normalizedDirectionToViewer = normalizeVector({ vector: polygonToViewerDirection });
-        
-        // Calculate projection length
-        const projectionLength = vectorLength({ vector: polygonToViewerDirection });
-        
-        // Create virtual projection configuration
-        const virtualProjectionConfig = {
-            emissionPoint: virtualPolygonCenter,
-            directorVector: normalizedDirectionToViewer,
-            maxLength: projectionLength,
-            strokeColor: this.beamConfig.virtualBeam.color,
-            strokeWidth: this.beamConfig.virtualBeam.strokeWidth,
-            animated: true,
-            animationDuration: this.beamConfig.virtualBeam.animationDuration,
-            parentSvg: this.svgCanvas
-        };
-        
-        const virtualProjection = new VirtualLightBeam(virtualProjectionConfig);
-        virtualProjection.sourceVirtualPolygon = virtualPolygon;
-        this.virtualProjections.push(virtualProjection);
+        console.warn('castVirtualProjection is deprecated. Use createProjections() instead.');
+        this.modularProjector.getVirtualManager().createProjection({ virtualPolygon, viewer: this.viewer });
     }
 
-    /**
-     * Update the virtual projection when scene elements are dragged
-     */
-    updateVirtualProjection() {
-        if (this.virtualProjections.length === 0) return;
-
-        // Calculate emission point (center of virtual polygon)
-        const virtualPolygonCenter = calculatePolygonCenter({ vertices: this.lastClickedVirtualPolygon.vertices });
-        
-        // Calculate direction vector from polygon to viewer
-        const polygonToViewerDirection = { 
-            x: this.viewer.x - virtualPolygonCenter.x, 
-            y: this.viewer.y - virtualPolygonCenter.y 
-        };
-        const normalizedDirectionToViewer = normalizeVector({ vector: polygonToViewerDirection });
-        
-        // Calculate projection length
-        const projectionLength = vectorLength({ vector: polygonToViewerDirection });
-
-        const virtualProjection = this.virtualProjections[0];
-        virtualProjection.emissionPoint = virtualPolygonCenter;
-        virtualProjection.directorVector = normalizedDirectionToViewer;
-        virtualProjection.maxLength = projectionLength;
-        virtualProjection.points = [
-            virtualPolygonCenter,
-            {
-                x: virtualPolygonCenter.x + normalizedDirectionToViewer.x * projectionLength,
-                y: virtualPolygonCenter.y + normalizedDirectionToViewer.y * projectionLength
-            }
-        ];
-
-        virtualProjection.updateBeamPath();
-    }
-
-    /**
-     * Clear all virtual projections
-     */
-    clearVirtualProjections() {
-        this.virtualProjections.forEach(virtualProjection => {
-            virtualProjection.destroy();
-        });
-        this.virtualProjections = [];
-    }
-
-    // ============================================
-    // REAL BEAM METHODS
-    // ============================================
-
-    /**
-     * Cast a real projection from source polygon using calculated reflection path
-     * @param {Object} config
-     * @param {VirtualPolygon} config.virtualPolygon - The virtual polygon
-     */
     castRealProjection({ virtualPolygon }) {
-        if (!this.lightBeamEngine) return;
-
-        this.clearRealBeams();
-
-        const realProjectionDirectorVector = this.getRealProjectionDirectorVector({ virtualPolygon });
-        if (!realProjectionDirectorVector) return;
-
-        // Calculate real projection properties inline
-        const virtualPolygonCenter = calculatePolygonCenter({ vertices: virtualPolygon.vertices });
-        const virtualPolygonToViewerDirection = { 
-            x: virtualPolygonCenter.x - this.viewer.x, 
-            y: virtualPolygonCenter.y - this.viewer.y 
-        };
-        const realProjectionLength = vectorLength({ vector: virtualPolygonToViewerDirection });
-        const realPolygonCenter = calculatePolygonCenter({ 
-            vertices: virtualPolygon.sourcePolygon.vertices 
-        });
-
-        const realProjection = this.lightBeamEngine.createLightBeam({
-            emissionPoint: realPolygonCenter,
-            directorVector: realProjectionDirectorVector,
-            maxLength: realProjectionLength,
-            strokeColor: this.beamConfig.realBeam.color,
-            strokeWidth: this.beamConfig.realBeam.strokeWidth,
-            animated: true,
-            animationDuration: this.beamConfig.realBeam.animationDuration,
-            mirrors: this.mirrors
-        });
-        realProjection.sourceVirtualPolygon = virtualPolygon;
-        this.realProjections.push(realProjection);
+        console.warn('castRealProjection is deprecated. Use createProjections() instead.');
+        this.modularProjector.getRealManager().createProjection({ virtualPolygon, viewer: this.viewer });
     }
 
-    /**
-     * Update the real projection when scene elements are dragged
-     */
-    updateRealProjection() {
-        if (this.realProjections.length === 0) return;
-
-        const realProjectionDirectorVector = this.getRealProjectionDirectorVector({ 
-            virtualPolygon: this.lastClickedVirtualPolygon 
-        });
-        if (!realProjectionDirectorVector) return;
-
-        // Calculate real projection properties inline
-        const virtualPolygonCenter = calculatePolygonCenter({ vertices: this.lastClickedVirtualPolygon.vertices });
-        const polygonToViewerDirection = { 
-            x: virtualPolygonCenter.x - this.viewer.x, 
-            y: virtualPolygonCenter.y - this.viewer.y 
-        };
-        const realProjectionLength = vectorLength({ vector: polygonToViewerDirection });
-        const realPolygonCenter = calculatePolygonCenter({ 
-            vertices: this.lastClickedVirtualPolygon.sourcePolygon.vertices 
-        });
-
-        // Create temporary beam to get updated reflection points
-        const tempProjection = this.lightBeamEngine.createLightBeam({
-            emissionPoint: realPolygonCenter,
-            directorVector: realProjectionDirectorVector,
-            maxLength: realProjectionLength,
-            strokeColor: this.beamConfig.realBeam.color,
-            strokeWidth: this.beamConfig.realBeam.strokeWidth,
-            animated: false,
-            animationDuration: 0,
-            mirrors: this.mirrors
-        });
-
-        // Update existing projection with new properties
-        if (tempProjection && tempProjection.points && this.realProjections[0]) {
-            const realProjection = this.realProjections[0];
-            realProjection.emissionPoint = realPolygonCenter;
-            realProjection.directorVector = realProjectionDirectorVector;
-            realProjection.maxLength = realProjectionLength;
-            realProjection.points = [...tempProjection.points];
-            realProjection.updateBeamPath();
-        }
-
-        // Cleanup
-        if (tempProjection && tempProjection.destroy) {
-            tempProjection.destroy();
-        }
+    clearVirtualProjections() {
+        console.warn('clearVirtualProjections is deprecated. Use clearAllProjections() instead.');
+        this.modularProjector.getVirtualManager().clearAll();
     }
 
-    /**
-     * Clear all real beams
-     */
     clearRealBeams() {
-        this.realProjections.forEach(beam => {
-            if (beam && beam.destroy) {
-                beam.destroy();
-            }
-        });
-        this.realProjections = [];
+        console.warn('clearRealBeams is deprecated. Use clearAllProjections() instead.');
+        this.modularProjector.getRealManager().clearAll();
     }
 
-    // ============================================
-    // CALCULATION HELPERS
-    // ============================================
-
-    /**
-     * Calculate the director vector for real projection using reflection path analysis
-     * @param {Object} config
-     * @param {VirtualPolygon} config.virtualPolygon - The virtual polygon to analyze
-     * @returns {Object|null} Normalized direction vector {x, y} or null if calculation fails
-     */
-    getRealProjectionDirectorVector({ virtualPolygon }) {
-        if (!this.viewer || !this.lightBeamEngine) return null;
-        
-        const virtualPolygonCenter = calculatePolygonCenter({ vertices: virtualPolygon.vertices });
-        const polygonToViewerDirection = { 
-            x: virtualPolygonCenter.x - this.viewer.x, 
-            y: virtualPolygonCenter.y - this.viewer.y 
-        };
-        const normalizedDirectionToViewer = normalizeVector({ vector: polygonToViewerDirection });
-        const projectionLength = vectorLength({ vector: polygonToViewerDirection });
-        
-        // Create temporary projection to calculate reflection path
-        const tempProjection = this.lightBeamEngine.createLightBeam({
-            emissionPoint: { x: this.viewer.x, y: this.viewer.y },
-            directorVector: normalizedDirectionToViewer,
-            maxLength: projectionLength,
-            strokeColor: this.beamConfig.realBeam.color,
-            strokeWidth: this.beamConfig.realBeam.strokeWidth,
-            animated: false,
-            animationDuration: 0,
-            mirrors: this.mirrors
-        });
-        
-        let realProjectionDirectorVector = null;
-        
-        // Extract direction from last segment
-        if (tempProjection && tempProjection.points && tempProjection.points.length >= 2) {
-            const reflectionPoints = tempProjection.points;
-            const lastReflectionPoint = reflectionPoints[reflectionPoints.length - 1];
-            const secondLastReflectionPoint = reflectionPoints[reflectionPoints.length - 2];
-            
-            const segmentDirection = {
-                x: lastReflectionPoint.x - secondLastReflectionPoint.x,
-                y: lastReflectionPoint.y - secondLastReflectionPoint.y
-            };
-            
-            // Invert direction (we want real polygon → viewer, not viewer → virtual polygon)
-            const invertedDirection = {
-                x: -segmentDirection.x,
-                y: -segmentDirection.y
-            };
-            realProjectionDirectorVector = normalizeVector({ vector: invertedDirection });
-        }
-        
-        // Cleanup
-        if (tempProjection && tempProjection.destroy) {
-            tempProjection.destroy();
-        }
-        
-        return realProjectionDirectorVector;
-    }
-
-    // ============================================
-    // VALIDATION HELPERS
-    // ============================================
-
-    /**
-     * Check if the real projection endpoint is close enough to the viewer center
-     * @param {Object} config
-     * @param {VirtualPolygon} config.virtualPolygon - The virtual polygon
-     * @returns {boolean} True if projection endpoint matches viewer position
-     */
     isProjectionEndpointAtViewer({ virtualPolygon }) {
-        const realProjectionDirectorVector = this.getRealProjectionDirectorVector({ virtualPolygon });
-        if (!realProjectionDirectorVector) return false;
-
-        // Calculate real projection properties inline
-        const virtualPolygonCenter = calculatePolygonCenter({ vertices: virtualPolygon.vertices });
-        const polygonToViewerDirection = { 
-            x: virtualPolygonCenter.x - this.viewer.x, 
-            y: virtualPolygonCenter.y - this.viewer.y 
-        };
-        const realProjectionLength = vectorLength({ vector: polygonToViewerDirection });
-        const realPolygonCenter = calculatePolygonCenter({ 
-            vertices: virtualPolygon.sourcePolygon.vertices 
-        });
-        
-        // Create temporary projection to get reflection path
-        const tempProjection = this.lightBeamEngine.createLightBeam({
-            emissionPoint: realPolygonCenter,
-            directorVector: realProjectionDirectorVector,
-            maxLength: realProjectionLength,
-            strokeColor: this.beamConfig.realBeam.color,
-            strokeWidth: this.beamConfig.realBeam.strokeWidth,
-            animated: false,
-            animationDuration: 0,
-            mirrors: this.mirrors
-        });
-
-        let isValidProjection = false;
-        if (tempProjection && tempProjection.points && tempProjection.points.length > 0) {
-            const projectionEndpoint = tempProjection.points[tempProjection.points.length - 1];
-            const distanceToViewer = Math.sqrt(
-                Math.pow(projectionEndpoint.x - this.viewer.x, 2) + 
-                Math.pow(projectionEndpoint.y - this.viewer.y, 2)
-            );
-            isValidProjection = distanceToViewer < this.beamConfig.virtualBeam.tolerance;
-        }
-
-        // Cleanup
-        if (tempProjection && tempProjection.destroy) {
-            tempProjection.destroy();
-        }
-
-        return isValidProjection;
+        console.warn('isProjectionEndpointAtViewer is deprecated. Use modular system validation.');
+        return this.modularProjector.isValidProjection({ virtualPolygon });
     }
 }

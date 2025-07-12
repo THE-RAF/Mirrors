@@ -9,6 +9,7 @@ import { Viewer } from '../basicEntities/real/Viewer.js';
 import { ReflectionEngine } from '../engines/ReflectionEngine.js';
 import { LightBeamEngine } from '../engines/LightBeamEngine.js';
 import { LightBeamProjector } from '../feedbackSystems/LightBeamProjector.js';
+import { ModularLightBeamProjector } from '../feedbackSystems/ModularLightBeamProjector.js';
 
 /**
  * @class SimpleReflectionMode
@@ -156,7 +157,7 @@ export class SimpleReflectionMode {
      * Create light beam projector
      */
     createLightBeamProjector() {
-        this.virtualLightCaster = new LightBeamProjector({
+        this.virtualLightCaster = new ModularLightBeamProjector({
             svgCanvas: this.beamLayer,
             viewer: this.viewers[0],
             lightBeamEngine: this.lightBeamEngine,
