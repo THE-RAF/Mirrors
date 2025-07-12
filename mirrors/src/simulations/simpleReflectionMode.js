@@ -37,7 +37,7 @@ export class SimpleReflectionMode {
         
         // Initialize engines
         this.reflectionEngine = new ReflectionEngine({ 
-            svgCanvas,
+            svgCanvas: this.virtualLayer,  // Virtual objects go to virtual layer
             onVirtualPolygonClick: (virtualPolygon, event) => {
                 this.handleVirtualPolygonClick({ virtualPolygon });
             }
@@ -65,15 +65,23 @@ export class SimpleReflectionMode {
      * Create SVG layer groups for proper z-ordering
      */
     createSVGLayers() {
-        // Create background layer for light beams
+        // Create background layer for light beams (bottom layer)
         this.beamLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         this.beamLayer.setAttribute('class', 'beam-layer');
         this.svgCanvas.appendChild(this.beamLayer);
 
-        // Create foreground layer for objects (polygons, mirrors, viewers)
-        this.objectLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        this.objectLayer.setAttribute('class', 'object-layer');
-        this.svgCanvas.appendChild(this.objectLayer);
+        // Create middle layer for virtual objects (virtual polygons, virtual mirrors, virtual viewers)
+        this.virtualLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        this.virtualLayer.setAttribute('class', 'virtual-layer');
+        this.svgCanvas.appendChild(this.virtualLayer);
+
+        // Create foreground layer for real objects (real polygons, real mirrors, real viewers) - top layer
+        this.realLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        this.realLayer.setAttribute('class', 'real-layer');
+        this.svgCanvas.appendChild(this.realLayer);
+        
+        // Keep objectLayer as an alias to realLayer for backward compatibility
+        this.objectLayer = this.realLayer;
     }
 
     /**
@@ -215,8 +223,11 @@ export class SimpleReflectionMode {
         if (this.beamLayer?.parentNode) {
             this.beamLayer.parentNode.removeChild(this.beamLayer);
         }
-        if (this.objectLayer?.parentNode) {
-            this.objectLayer.parentNode.removeChild(this.objectLayer);
+        if (this.virtualLayer?.parentNode) {
+            this.virtualLayer.parentNode.removeChild(this.virtualLayer);
+        }
+        if (this.realLayer?.parentNode) {
+            this.realLayer.parentNode.removeChild(this.realLayer);
         }
         
         // Clear arrays
