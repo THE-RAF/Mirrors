@@ -90,7 +90,7 @@ export class VirtualPolygon extends Polygon {
             
             // Call the callback if provided
             if (this.onVirtualClick) {
-                this.onVirtualClick(this, event);
+                this.onVirtualClick({ virtualPolygon: this, event });
             }
         });
         

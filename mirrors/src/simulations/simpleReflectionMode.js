@@ -59,7 +59,7 @@ export class SimpleReflectionMode {
         // Initialize engines
         this.reflectionEngine = new ReflectionEngine({ 
             svgCanvas: this.middleLayer,  // Virtual objects go to middle layer
-            onVirtualPolygonClick: (virtualPolygon, event) => {
+            onVirtualPolygonClick: ({ virtualPolygon, event }) => {
                 this.handleVirtualPolygonClick({ virtualPolygon });
             },
             virtualPolygonsClickable: this.modeConfig.lightBeamProjector.enabled
@@ -119,21 +119,22 @@ export class SimpleReflectionMode {
      */
     initializeSVGLayers() {
         // Create background layer (for light beams)
-        this.backgroundLayer = this.createSVGLayer('background-layer');
+        this.backgroundLayer = this.createSVGLayer({ className: 'background-layer' });
         
         // Create middle layer (for reflections and virtual objects)
-        this.middleLayer = this.createSVGLayer('middle-layer');
+        this.middleLayer = this.createSVGLayer({ className: 'middle-layer' });
         
         // Create foreground layer (for real polygons, mirrors, viewers)
-        this.foregroundLayer = this.createSVGLayer('foreground-layer');
+        this.foregroundLayer = this.createSVGLayer({ className: 'foreground-layer' });
     }
 
     /**
      * Create and append a single SVG layer group
-     * @param {string} className - CSS class name for the layer
+     * @param {Object} config
+     * @param {string} config.className - CSS class name for the layer
      * @returns {SVGGElement} The created layer element
      */
-    createSVGLayer(className) {
+    createSVGLayer({ className }) {
         const layer = document.createElementNS(SVG_NAMESPACE, 'g');
         layer.setAttribute('class', className);
         this.svgCanvas.appendChild(layer);
@@ -315,9 +316,9 @@ export class SimpleReflectionMode {
      */
     destroySVGLayers() {
         // Remove layers in reverse order (top to bottom)
-        this.removeSVGLayer(this.foregroundLayer);
-        this.removeSVGLayer(this.middleLayer);
-        this.removeSVGLayer(this.backgroundLayer);
+        this.removeSVGLayer({ layer: this.foregroundLayer });
+        this.removeSVGLayer({ layer: this.middleLayer });
+        this.removeSVGLayer({ layer: this.backgroundLayer });
         
         // Clear references
         this.backgroundLayer = null;
@@ -327,9 +328,10 @@ export class SimpleReflectionMode {
 
     /**
      * Safely remove a single SVG layer
-     * @param {SVGGElement} layer - The layer to remove
+     * @param {Object} config
+     * @param {SVGGElement} config.layer - The layer to remove
      */
-    removeSVGLayer(layer) {
+    removeSVGLayer({ layer }) {
         if (layer?.parentNode) {
             layer.parentNode.removeChild(layer);
         }

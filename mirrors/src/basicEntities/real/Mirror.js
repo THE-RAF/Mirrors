@@ -78,8 +78,8 @@ export class Mirror {
     createMirrorLines() {
         const { reflectiveOffset, backOffset } = this.calculateLineOffsets();
         
-        this.backLine = this.createLine(backOffset, this.backColor);
-        this.reflectiveLine = this.createLine(reflectiveOffset, this.reflectiveColor);
+        this.backLine = this.createLine({ offset: backOffset, color: this.backColor });
+        this.reflectiveLine = this.createLine({ offset: reflectiveOffset, color: this.reflectiveColor });
         
         this.group.appendChild(this.backLine);
         this.group.appendChild(this.reflectiveLine);
@@ -87,11 +87,12 @@ export class Mirror {
 
     /**
      * Create a single mirror line with the given offset and color
-     * @param {Object} offset - {x1, y1, x2, y2} coordinates for the line
-     * @param {string} color - Line color
+     * @param {Object} config
+     * @param {Object} config.offset - {x1, y1, x2, y2} coordinates for the line
+     * @param {string} config.color - Line color
      * @returns {SVGLineElement} The created line element
      */
-    createLine(offset, color) {
+    createLine({ offset, color }) {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', offset.x1);
         line.setAttribute('y1', offset.y1);
@@ -198,16 +199,17 @@ export class Mirror {
 
         const { reflectiveOffset, backOffset } = this.calculateLineOffsets();
 
-        this.updateLinePosition(this.backLine, backOffset);
-        this.updateLinePosition(this.reflectiveLine, reflectiveOffset);
+        this.updateLinePosition({ line: this.backLine, offset: backOffset });
+        this.updateLinePosition({ line: this.reflectiveLine, offset: reflectiveOffset });
     }
 
     /**
      * Update a single line element with new coordinates
-     * @param {SVGLineElement} line - The line element to update
-     * @param {Object} offset - {x1, y1, x2, y2} coordinates for the line
+     * @param {Object} config
+     * @param {SVGLineElement} config.line - The line element to update
+     * @param {Object} config.offset - {x1, y1, x2, y2} coordinates for the line
      */
-    updateLinePosition(line, offset) {
+    updateLinePosition({ line, offset }) {
         line.setAttribute('x1', offset.x1);
         line.setAttribute('y1', offset.y1);
         line.setAttribute('x2', offset.x2);

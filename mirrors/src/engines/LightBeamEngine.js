@@ -37,7 +37,7 @@ export class LightBeamEngine {
      */
     calculateReflectionPath({ emissionPoint, directorVector, mirrors = [], maxLength = 800, maxReflections = 10 }) {
         // Find the closest mirror intersection for a ray
-        function findClosestIntersection(rayStart, rayDirection, mirrors) {
+        function findClosestIntersection({ rayStart, rayDirection, mirrors }) {
             let closestIntersection = null;
             let closestDistance = Infinity;
             let closestMirror = null;
@@ -65,7 +65,7 @@ export class LightBeamEngine {
         }
         
         // Calculate final point when no more intersections are found
-        function addFinalPoint(currentPoint, currentDirection, remainingLength) {
+        function addFinalPoint({ currentPoint, currentDirection, remainingLength }) {
             return {
                 x: currentPoint.x + currentDirection.x * remainingLength,
                 y: currentPoint.y + currentDirection.y * remainingLength
@@ -80,7 +80,11 @@ export class LightBeamEngine {
 
         // Main ray tracing loop
         for (let i = 0; i < maxReflections && remainingLength > 0; i++) {
-            const { intersection, distance, mirror } = findClosestIntersection(currentPoint, currentDirection, mirrors);
+            const { intersection, distance, mirror } = findClosestIntersection({ 
+                rayStart: currentPoint, 
+                rayDirection: currentDirection, 
+                mirrors 
+            });
             
             if (intersection && distance <= remainingLength) {
                 // Add intersection point and reflect
@@ -95,7 +99,7 @@ export class LightBeamEngine {
                 remainingLength -= distance;
             } else {
                 // No more intersections - add final point and exit
-                points.push(addFinalPoint(currentPoint, currentDirection, remainingLength));
+                points.push(addFinalPoint({ currentPoint, currentDirection, remainingLength }));
                 break;
             }
         }

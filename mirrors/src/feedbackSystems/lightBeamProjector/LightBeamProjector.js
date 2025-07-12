@@ -32,7 +32,7 @@ export class LightBeamProjector {
         this.mirrors = mirrors;
         
         // Initialize beam configuration with defaults
-        this.beamConfig = this.initializeBeamConfig(beamConfig);
+        this.beamConfig = this.initializeBeamConfig({ beamConfig });
         
         // Create specialized managers
         this.virtualManager = new VirtualProjectionManager({
@@ -56,10 +56,11 @@ export class LightBeamProjector {
 
     /**
      * Initialize beam configuration with defaults
-     * @param {Object|undefined} beamConfig - User-provided beam configuration
+     * @param {Object} config
+     * @param {Object|undefined} config.beamConfig - User-provided beam configuration
      * @returns {Object} Complete beam configuration with defaults
      */
-    initializeBeamConfig(beamConfig) {
+    initializeBeamConfig({ beamConfig }) {
         return {
             virtualBeam: {
                 color: beamConfig?.virtualBeam?.color || '#fa6c00',
@@ -248,7 +249,7 @@ export class LightBeamProjector {
     triggerEvent({ eventName, data }) {
         const handler = this.eventHandlers[eventName];
         if (handler && typeof handler === 'function') {
-            handler(data);
+            handler({ data });
         }
     }
 
