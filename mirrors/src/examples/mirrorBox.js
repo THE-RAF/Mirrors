@@ -2,6 +2,8 @@
  * @file examples/basicReflection.js - Basic reflection example
  */
 
+import { createTriangle, createSquare } from '../utils/geometryFactory.js';
+
 export const basicReflectionExample = {
     name: "Basic Reflection",
     description: "Simple polygon reflection with interactive mirrors",
@@ -10,47 +12,43 @@ export const basicReflectionExample = {
         objects: [
             {
                 // Triangle
-                vertices: [
-                    { x: 200, y: 200 },
-                    { x: 300, y: 100 },
-                    { x: 300, y: 200 }
-                ],
+                vertices: createTriangle({ center: { x: 400, y: 350 } }),
                 fill: '#ff6b6b'
             },
             {
                 // Square
-                vertices: [
-                    { x: 250, y: 350 },
-                    { x: 350, y: 350 },
-                    { x: 350, y: 450 },
-                    { x: 250, y: 450 }
-                ],
+                vertices: createSquare({ center: { x: 350, y: 400 } }),
                 fill: '#ffcc00',
-            },
-            {
-                // trapezoid
-                vertices: [
-                    { x: 50, y: 250 },
-                    { x: 100, y: 250 },
-                    { x: 150, y: 350 },
-                    { x: 50, y: 350 }
-                ],
-                fill: '#00ccff',
             }
         ],
         mirrors: [
             {
-                // Vertical mirror at the center
-                x1: 400, y1: 0,
-                x2: 400, y2: 800,
+                // Vertical mirror at the right
+                x1: 500, y1: 300,
+                x2: 500, y2: 500,
             },
+            {
+                // Horizontal mirror at the top
+                x1: 300, y1: 300,
+                x2: 500, y2: 300,
+            },
+            {
+                // vertical mirror at the left
+                x1: 300, y1: 500,
+                x2: 300, y2: 300,
+            },
+            {
+                // Horizontal mirror at the bottom
+                x1: 500, y1: 500,
+                x2: 300, y2: 500,
+            }
         ],
         viewers: [
             {
                 // Main viewer position
-                x: 200,
-                y: 600,
-                radius: 50,
+                x: 450,
+                y: 450,
+                radius: 12,
                 fill: '#4a90e2'
             }
         ],
@@ -60,7 +58,7 @@ export const basicReflectionExample = {
     modeConfig: {
         interaction: {
             draggablePolygons: true,
-            draggableMirrors: false,
+            draggableMirrors: true,
             draggableViewers: true
         },
         lightBeamProjector: {

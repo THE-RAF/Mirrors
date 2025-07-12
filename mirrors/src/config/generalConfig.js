@@ -9,6 +9,6 @@ export const generalConfig = {
     },
     
     // Example selection - change this to load different examples
-    // Available options: 'basic-reflection', 'kaleidoscope', 'laser-show', 'geometry-playground'
-    currentExample: 'kaleidoscope'
+    // Available options: 'basic-reflection', 'diagonal-reflection', 'laser-show', 'geometry-playground'
+    currentExample: 'diagonal-reflection'
 };

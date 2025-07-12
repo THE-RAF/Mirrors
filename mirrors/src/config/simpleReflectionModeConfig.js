@@ -2,7 +2,7 @@
  * @file simpleReflectionModeConfig.js - Configuration for simple reflection mode
  */
 
-import { createTriangle, createSquare } from '../utils/geometry.js';
+import { createTriangle, createSquare } from '../utils/geometryFactory.js';
 
 export const modeConfig = {
     interaction: {

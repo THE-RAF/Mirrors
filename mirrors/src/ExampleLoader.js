@@ -3,16 +3,12 @@
  */
 
 import { basicReflectionExample } from './examples/basicReflection.js';
-import { kaleidoscopeExample } from './examples/kaleidoscope.js';
-import { laserShowExample } from './examples/laserShow.js';
-import { geometryPlaygroundExample } from './examples/geometryPlayground.js';
+import { diagonalReflectionExample } from './examples/diagonalReflection.js';
 
 // Collection of all available examples
 export const examples = {
     'basic-reflection': basicReflectionExample,
-    'kaleidoscope': kaleidoscopeExample,
-    'laser-show': laserShowExample,
-    'geometry-playground': geometryPlaygroundExample
+    'diagonal-reflection': diagonalReflectionExample,
 };
 
 /**
