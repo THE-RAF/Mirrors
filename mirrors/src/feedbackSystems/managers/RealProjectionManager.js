@@ -25,24 +25,6 @@ export class RealProjectionManager {
     }
 
     /**
-     * Create or toggle real projection for a specific polygon
-     * @param {Object} config
-     * @param {Object} config.virtualPolygon - The virtual polygon
-     * @param {Object} config.viewer - The viewer object
-     * @returns {Object|null} Created projection or null if toggled off/invalid
-     */
-    createOrToggleProjection({ virtualPolygon, viewer }) {
-        // If projection exists, remove it (toggle off)
-        if (this.projectionsByPolygon.has(virtualPolygon)) {
-            this.removeProjection({ virtualPolygon });
-            return null;
-        }
-
-        // Create new projection (toggle on)
-        return this.createProjection({ virtualPolygon, viewer });
-    }
-
-    /**
      * Create real projection for a polygon
      * @param {Object} config
      * @param {Object} config.virtualPolygon - The virtual polygon
@@ -131,20 +113,6 @@ export class RealProjectionManager {
         }
         this.projectionsByPolygon.delete(virtualPolygon);
         return true;
-    }
-
-    /**
-     * Update all active projections (called when scene elements are dragged)
-     * @param {Object} config
-     * @param {Object} config.viewer - The viewer object
-     */
-    updateAllProjections({ viewer }) {
-        // Convert to array to avoid modification during iteration
-        const polygonsToUpdate = Array.from(this.projectionsByPolygon.keys());
-        
-        for (const virtualPolygon of polygonsToUpdate) {
-            this.updateProjection({ virtualPolygon, viewer });
-        }
     }
 
     /**

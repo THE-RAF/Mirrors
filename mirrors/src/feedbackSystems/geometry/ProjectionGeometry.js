@@ -101,51 +101,22 @@ export function calculateRealProjectionPath({ virtualPolygon, viewer, lightBeamE
 export function validateProjectionEndpoint({ projectionPath, viewer, lightBeamEngine, mirrors, tolerance = 10 }) {
     if (!projectionPath || !lightBeamEngine) return false;
     
-    // Create temporary beam to verify endpoint
-    const tempBeam = lightBeamEngine.createLightBeam({
+    // Use pure geometry calculation (NO DOM CREATION!)
+    const reflectionPoints = lightBeamEngine.calculateReflectionPath({
         emissionPoint: projectionPath.emissionPoint,
         directorVector: projectionPath.direction,
-        maxLength: projectionPath.length,
-        strokeColor: '#temp',
-        strokeWidth: 1,
-        animated: false,
-        animationDuration: 0,
-        mirrors
+        mirrors,
+        maxLength: projectionPath.length
     });
     
-    let isValid = false;
-    if (tempBeam && tempBeam.points && tempBeam.points.length > 0) {
-        const endpoint = tempBeam.points[tempBeam.points.length - 1];
+    if (reflectionPoints && reflectionPoints.length > 0) {
+        const endpoint = reflectionPoints[reflectionPoints.length - 1];
         const distance = Math.sqrt(
             Math.pow(endpoint.x - viewer.x, 2) + 
             Math.pow(endpoint.y - viewer.y, 2)
         );
-        isValid = distance < tolerance;
+        return distance < tolerance;
     }
     
-    // Cleanup
-    if (tempBeam && tempBeam.destroy) {
-        tempBeam.destroy();
-    }
-    
-    return isValid;
-}
-
-/**
- * Update projection path for a changed scene (when objects are dragged)
- * @param {Object} config
- * @param {Object} config.virtualPolygon - The virtual polygon
- * @param {Object} config.viewer - The viewer object
- * @param {Object} config.lightBeamEngine - Engine for calculations
- * @param {Array} config.mirrors - Array of mirror objects
- * @returns {Object} Updated projection paths { virtual, real }
- */
-export function updateProjectionPaths({ virtualPolygon, viewer, lightBeamEngine, mirrors }) {
-    const virtualPath = calculateVirtualProjectionPath({ virtualPolygon, viewer });
-    const realPath = calculateRealProjectionPath({ virtualPolygon, viewer, lightBeamEngine, mirrors });
-    
-    return {
-        virtual: virtualPath,
-        real: realPath
-    };
+    return false;
 }
