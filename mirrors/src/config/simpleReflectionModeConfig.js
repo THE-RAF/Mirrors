@@ -12,7 +12,7 @@ export const modeConfig = {
     },
     lightBeamProjectorConfig: {
         virtualBeam: {
-            color: '#ff4444',
+            color: '#fa6c00',
             strokeWidth: 2,
             animationDuration: 1000,
             tolerance: 10 // px tolerance for endpoint validation
@@ -29,32 +29,42 @@ export const sceneEntities = {
     objects: [
         {
             // Triangle
-            vertices: createTriangle({ center: { x: 300, y: 400 } }),
+            vertices: createTriangle({ center: { x: 400, y: 350 } }),
             fill: '#ff6b6b'
         },
         {
             // Square
-            vertices: createSquare({ center: { x: 250, y: 350 } }),
+            vertices: createSquare({ center: { x: 350, y: 400 } }),
             fill: '#ffcc00',
         }
     ],
     mirrors: [
         {
-            // Vertical mirror in the center
-            x1: 400, y1: 300,
-            x2: 350, y2: 500,
+            // Vertical mirror at the right
+            x1: 500, y1: 300,
+            x2: 500, y2: 500,
         },
         {
             // Horizontal mirror at the top
             x1: 300, y1: 300,
             x2: 500, y2: 300,
+        },
+        {
+            // vertical mirror at the left
+            x1: 300, y1: 500,
+            x2: 300, y2: 300,
+        },
+        {
+            // Horizontal mirror at the bottom
+            x1: 500, y1: 500,
+            x2: 300, y2: 500,
         }
     ],
     viewers: [
         {
             // Main viewer position
-            x: 180,
-            y: 320,
+            x: 450,
+            y: 450,
             radius: 12,
             fill: '#4a90e2'
         }

@@ -39,7 +39,7 @@ export class LightBeamProjector {
     initializeBeamConfig(beamConfig) {
         return {
             virtualBeam: {
-                color: beamConfig?.virtualBeam?.color || '#ff4444',
+                color: beamConfig?.virtualBeam?.color || '#fa6c00',
                 strokeWidth: beamConfig?.virtualBeam?.strokeWidth || 2,
                 animationDuration: beamConfig?.virtualBeam?.animationDuration || 1000,
                 tolerance: beamConfig?.virtualBeam?.tolerance || 10

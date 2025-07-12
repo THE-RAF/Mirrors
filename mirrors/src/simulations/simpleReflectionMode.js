@@ -8,7 +8,7 @@ import { Mirror } from '../basicEntities/real/Mirror.js';
 import { Viewer } from '../basicEntities/real/Viewer.js';
 import { ReflectionEngine } from '../engines/ReflectionEngine.js';
 import { LightBeamEngine } from '../engines/LightBeamEngine.js';
-import { LightBeamProjector } from '../features/LightBeamProjector.js';
+import { LightBeamProjector } from '../feedbackSystems/LightBeamProjector.js';
 
 /**
  * @class SimpleReflectionMode

@@ -92,8 +92,6 @@ export class VirtualPolygon extends Polygon {
             if (this.onVirtualClick) {
                 this.onVirtualClick(this, event);
             }
-            
-            console.log('Virtual polygon clicked:', this);
         });
         
         // Add hover effects for better UX
