@@ -1,12 +1,12 @@
 /**
- * @file examples/basicReflection.js - Basic reflection example
+ * @file examples/mirrorBox.js - Mirror box reflection example
  */
 
 import { createTriangle, createSquare } from '../utils/geometryFactory.js';
 
-export const basicReflectionExample = {
-    name: "Basic Reflection",
-    description: "Simple polygon reflection with interactive mirrors",
+export const mirrorBoxExample = {
+    name: "Mirror box",
+    description: "4 mirror box with a triangle, a square and a viewer inside",
     
     sceneEntities: {
         objects: [

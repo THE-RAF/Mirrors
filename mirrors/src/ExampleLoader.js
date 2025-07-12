@@ -4,11 +4,13 @@
 
 import { basicReflectionExample } from './examples/basicReflection.js';
 import { diagonalReflectionExample } from './examples/diagonalReflection.js';
+import { mirrorBoxExample } from './examples/mirrorBox.js';
 
 // Collection of all available examples
 export const examples = {
     'basic-reflection': basicReflectionExample,
     'diagonal-reflection': diagonalReflectionExample,
+    'mirror-box': mirrorBoxExample,
 };
 
 /**
