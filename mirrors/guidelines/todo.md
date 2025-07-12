@@ -1,0 +1,2 @@
+- Refactor LightBeamProjector.js into a more readable file and class
+- Solve error when user clicks in another virtual polygon when casting beams before letting the last beam finish its animation
