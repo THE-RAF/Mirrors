@@ -3,7 +3,7 @@
  */
 
 import { SimpleReflectionMode } from './simulations/simpleReflectionMode.js';
-import { loadExample, getAvailableExamples } from './ExampleLoader.js';
+import { loadExample, getAvailableExamples } from './exampleLoader.js';
 import { generalConfig } from './config/generalConfig.js';
 
 // Set up canvas
