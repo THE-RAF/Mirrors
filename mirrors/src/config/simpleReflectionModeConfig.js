@@ -9,6 +9,19 @@ export const modeConfig = {
         draggablePolygons: true,
         draggableMirrors: true,
         draggableViewers: true
+    },
+    lightBeamProjectorConfig: {
+        virtualBeam: {
+            color: '#ff4444',
+            strokeWidth: 2,
+            animationDuration: 1000,
+            tolerance: 10 // px tolerance for endpoint validation
+        },
+        realBeam: {
+            color: '#ffdd00',
+            strokeWidth: 2,
+            animationDuration: 1000
+        }
     }
 };
 

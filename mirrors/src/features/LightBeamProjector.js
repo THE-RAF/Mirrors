@@ -12,28 +12,44 @@ import { normalizeVector, vectorLength } from '../math/linearAlgebra.js';
  * Projects light beams from virtual polygons to the viewer when clicked
  */
 export class LightBeamProjector {
-    // Constants
-    static VIRTUAL_BEAM_COLOR = '#ff4444';
-    static REAL_BEAM_COLOR = '#ffdd00';
-    static BEAM_STROKE_WIDTH = 2;
-    static VIRTUAL_ANIMATION_DURATION = 800;
-    static REAL_ANIMATION_DURATION = 800;
-
     /**
      * @param {Object} config
      * @param {SVGElement} config.svgCanvas - SVG canvas for rendering beams
      * @param {Object} config.viewer - The single viewer object
      * @param {Object} config.lightBeamEngine - Light beam engine for creating real light beams
      * @param {Array} config.mirrors - Array of mirror objects for beam reflections
+     * @param {Object} config.beamConfig - Beam appearance and behavior configuration
      */
-    constructor({ svgCanvas, viewer, lightBeamEngine, mirrors }) {
+    constructor({ svgCanvas, viewer, lightBeamEngine, mirrors, beamConfig }) {
         this.svgCanvas = svgCanvas;
         this.viewer = viewer;
         this.lightBeamEngine = lightBeamEngine;
         this.mirrors = mirrors;
+        this.beamConfig = this.initializeBeamConfig(beamConfig);
         this.virtualBeams = [];
         this.realBeams = [];
         this.lastClickedVirtualPolygon = null;
+    }
+
+    /**
+     * Initialize beam configuration with defaults
+     * @param {Object|undefined} beamConfig - User-provided beam configuration
+     * @returns {Object} Complete beam configuration with defaults
+     */
+    initializeBeamConfig(beamConfig) {
+        return {
+            virtualBeam: {
+                color: beamConfig?.virtualBeam?.color || '#ff4444',
+                strokeWidth: beamConfig?.virtualBeam?.strokeWidth || 2,
+                animationDuration: beamConfig?.virtualBeam?.animationDuration || 1000,
+                tolerance: beamConfig?.virtualBeam?.tolerance || 10
+            },
+            realBeam: {
+                color: beamConfig?.realBeam?.color || '#ffdd00',
+                strokeWidth: beamConfig?.realBeam?.strokeWidth || 2,
+                animationDuration: beamConfig?.realBeam?.animationDuration || 1000
+            }
+        };
     }
 
     // ============================================
@@ -184,8 +200,8 @@ export class LightBeamProjector {
             emissionPoint: realPolygonCenter,
             directorVector: directorVector,
             maxLength: beamLength,
-            strokeColor: LightBeamProjector.REAL_BEAM_COLOR,
-            strokeWidth: LightBeamProjector.BEAM_STROKE_WIDTH,
+            strokeColor: this.beamConfig.realBeam.color,
+            strokeWidth: this.beamConfig.realBeam.strokeWidth,
             animated: false,
             animationDuration: 0,
             mirrors: this.mirrors
@@ -277,8 +293,8 @@ export class LightBeamProjector {
             emissionPoint: { x: this.viewer.x, y: this.viewer.y },
             directorVector: normalizedDirection,
             maxLength: beamLength,
-            strokeColor: LightBeamProjector.REAL_BEAM_COLOR,
-            strokeWidth: LightBeamProjector.BEAM_STROKE_WIDTH,
+            strokeColor: this.beamConfig.realBeam.color,
+            strokeWidth: this.beamConfig.realBeam.strokeWidth,
             animated: false,
             animationDuration: 0,
             mirrors: this.mirrors
@@ -330,10 +346,10 @@ export class LightBeamProjector {
             emissionPoint: center,
             directorVector: directionToViewer,
             maxLength: distance,
-            strokeColor: LightBeamProjector.VIRTUAL_BEAM_COLOR,
-            strokeWidth: LightBeamProjector.BEAM_STROKE_WIDTH,
+            strokeColor: this.beamConfig.virtualBeam.color,
+            strokeWidth: this.beamConfig.virtualBeam.strokeWidth,
             animated: true,
-            animationDuration: LightBeamProjector.VIRTUAL_ANIMATION_DURATION,
+            animationDuration: this.beamConfig.virtualBeam.animationDuration,
             parentSvg: this.svgCanvas
         };
     }
@@ -351,10 +367,10 @@ export class LightBeamProjector {
             emissionPoint: realPolygonCenter,
             directorVector: directorVector,
             maxLength: beamLength,
-            strokeColor: LightBeamProjector.REAL_BEAM_COLOR,
-            strokeWidth: LightBeamProjector.BEAM_STROKE_WIDTH,
+            strokeColor: this.beamConfig.realBeam.color,
+            strokeWidth: this.beamConfig.realBeam.strokeWidth,
             animated: true,
-            animationDuration: LightBeamProjector.REAL_ANIMATION_DURATION,
+            animationDuration: this.beamConfig.realBeam.animationDuration,
             mirrors: this.mirrors
         };
     }
@@ -380,8 +396,8 @@ export class LightBeamProjector {
             emissionPoint: realPolygonCenter,
             directorVector: directorVector,
             maxLength: beamLength,
-            strokeColor: LightBeamProjector.REAL_BEAM_COLOR,
-            strokeWidth: LightBeamProjector.BEAM_STROKE_WIDTH,
+            strokeColor: this.beamConfig.realBeam.color,
+            strokeWidth: this.beamConfig.realBeam.strokeWidth,
             animated: false,
             animationDuration: 0,
             mirrors: this.mirrors
@@ -394,7 +410,7 @@ export class LightBeamProjector {
                 Math.pow(endpoint.x - this.viewer.x, 2) + 
                 Math.pow(endpoint.y - this.viewer.y, 2)
             );
-            isValid = distance < 10; // Allow 10px tolerance
+            isValid = distance < this.beamConfig.virtualBeam.tolerance;
         }
 
         // Cleanup

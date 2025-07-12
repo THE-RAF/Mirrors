@@ -134,7 +134,8 @@ export class SimpleReflectionMode {
             svgCanvas: this.svgCanvas,
             viewer: this.viewers[0],
             lightBeamEngine: this.lightBeamEngine,
-            mirrors: this.mirrors
+            mirrors: this.mirrors,
+            beamConfig: this.modeConfig.lightBeamProjectorConfig
         });
     }
 
