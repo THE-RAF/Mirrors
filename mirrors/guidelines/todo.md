@@ -1,7 +1,4 @@
-- Refactor LightBeamProjector.js into a more readable file and class
 - Solve error when user clicks in another virtual polygon when casting beams before letting the last beam finish its animation
-- finish implementation of multiple beams in LightBeamProjector
-- fix memory leak with LightBeamProjector
 - make the mirrors unidirectional (one face does not reflect)
 - make recursive reflections (virtual mirrors)
 - rename geometry.js to geometryFactory.js
