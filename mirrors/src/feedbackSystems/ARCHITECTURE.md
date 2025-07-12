@@ -21,7 +21,7 @@ Each module has a single, well-defined responsibility:
 - `ProjectionGeometry`: Mathematical calculations only
 - `VirtualProjectionManager`: Virtual beam lifecycle management
 - `RealProjectionManager`: Real beam lifecycle management
-- `ModularLightBeamProjector`: Coordination and public API
+- `LightBeamProjector`: Coordination and public API
 
 ### 3. Open/Closed Principle
 The system is open for extension but closed for modification:
@@ -39,7 +39,7 @@ High-level modules don't depend on low-level modules:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    ModularLightBeamProjector                    │
+│                      LightBeamProjector                       │
 │                    (Coordination Layer)                         │
 ├─────────────────────────────────────────────────────────────────┤
 │  • Public API                                                   │
@@ -129,7 +129,7 @@ updateProjectionPaths(virtualPolygon, viewer, lightBeamEngine, mirrors)
 - Invalid projection cleanup
 - Mirror system integration
 
-### ModularLightBeamProjector.js
+### LightBeamProjector.js
 **Purpose**: Main coordinator providing public API and orchestration
 **Responsibilities**:
 - Coordinate between managers
@@ -223,7 +223,7 @@ class CurvedProjectionManager {
 }
 
 // 2. Add to main projector
-class ExtendedProjector extends ModularLightBeamProjector {
+class ExtendedProjector extends LightBeamProjector {
     constructor(config) {
         super(config);
         this.curvedManager = new CurvedProjectionManager(config);
@@ -294,9 +294,9 @@ describe('VirtualProjectionManager', () => {
 ### Integration Testing
 ```javascript
 // Test full system behavior
-describe('ModularLightBeamProjector', () => {
+describe('LightBeamProjector', () => {
     test('toggle functionality', () => {
-        const projector = new ModularLightBeamProjector(config);
+        const projector = new LightBeamProjector(config);
         
         // First click creates
         projector.handleVirtualPolygonClick({ virtualPolygon });

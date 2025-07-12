@@ -1,23 +1,21 @@
 /**
- * @file LightBeamProjector.js - Compatibility wrapper for the modular projection system
- * Main exports: LightBeamProjector
+ * @file LightBeamProjector.js - Modular light beam projection system
+ * Coordinates virtual and real projection managers with clean separation of concerns
  * 
- * DEPRECATED: This is a compatibility wrapper. Use ModularLightBeamProjector for new projects.
- * 
- * TERMINOLOGY:
- * - Virtual Projection: Light beam projected from a virtual polygon directly to the viewer
- * - Real Projection: Light beam projected from the real polygon through mirror reflections to the viewer
- * - Projections are the specific light beams that connect polygons to the viewer when clicked
+ * Terminology:
+ * - Virtual Projection: Light beam projected from a virtual polygon to the viewer
+ * - Real Projection: Light beam projected from a real polygon through mirrors to the viewer
+ * - Projections: Specific light beams that connect polygons to the viewer
  */
 
-import { ModularLightBeamProjector } from './ModularLightBeamProjector.js';
+import { VirtualProjectionManager } from './managers/VirtualProjectionManager.js';
+import { RealProjectionManager } from './managers/RealProjectionManager.js';
+import { validateProjectionEndpoint, calculateRealProjectionPath } from './geometry/ProjectionGeometry.js';
 
 /**
  * @class LightBeamProjector
- * Compatibility wrapper for ModularLightBeamProjector
- * Maintains the original API while delegating to the new modular system
- * 
- * @deprecated Use ModularLightBeamProjector directly for new projects
+ * Main coordinator for the modular projection system
+ * Delegates specific responsibilities to specialized managers
  */
 export class LightBeamProjector {
     /**
@@ -29,159 +27,248 @@ export class LightBeamProjector {
      * @param {Object} config.beamConfig - Beam appearance and behavior configuration
      */
     constructor({ svgCanvas, viewer, lightBeamEngine, mirrors, beamConfig }) {
-        // Delegate to the new modular system
-        this.modularProjector = new ModularLightBeamProjector({
-            svgCanvas,
-            viewer,
-            lightBeamEngine,
-            mirrors,
-            beamConfig
-        });
-        
-        // Maintain compatibility properties for legacy code
-        this.svgCanvas = svgCanvas;
         this.viewer = viewer;
         this.lightBeamEngine = lightBeamEngine;
         this.mirrors = mirrors;
-        this.beamConfig = this.modularProjector.beamConfig;
         
-        // Legacy state properties (now computed from modular system)
-        this.lastClickedVirtualPolygon = null;
+        // Initialize beam configuration with defaults
+        this.beamConfig = this.initializeBeamConfig(beamConfig);
+        
+        // Create specialized managers
+        this.virtualManager = new VirtualProjectionManager({
+            svgCanvas,
+            beamConfig: this.beamConfig.virtualBeam
+        });
+        
+        this.realManager = new RealProjectionManager({
+            lightBeamEngine,
+            mirrors,
+            beamConfig: this.beamConfig.realBeam
+        });
+        
+        // Event handlers for external communication (optional)
+        this.eventHandlers = {
+            onProjectionCreated: null,
+            onProjectionRemoved: null,
+            onProjectionUpdated: null
+        };
+    }
+
+    /**
+     * Initialize beam configuration with defaults
+     * @param {Object|undefined} beamConfig - User-provided beam configuration
+     * @returns {Object} Complete beam configuration with defaults
+     */
+    initializeBeamConfig(beamConfig) {
+        return {
+            virtualBeam: {
+                color: beamConfig?.virtualBeam?.color || '#fa6c00',
+                strokeWidth: beamConfig?.virtualBeam?.strokeWidth || 2,
+                animationDuration: beamConfig?.virtualBeam?.animationDuration || 1000,
+                tolerance: beamConfig?.virtualBeam?.tolerance || 10
+            },
+            realBeam: {
+                color: beamConfig?.realBeam?.color || '#ffdd00',
+                strokeWidth: beamConfig?.realBeam?.strokeWidth || 2,
+                animationDuration: beamConfig?.realBeam?.animationDuration || 1000
+            }
+        };
     }
 
     // ============================================
-    // LEGACY COMPATIBILITY INTERFACE
+    // PUBLIC INTERFACE
     // ============================================
 
     /**
-     * Handle virtual polygon click events (legacy method)
+     * Handle virtual polygon click events with toggle functionality
      * @param {Object} config
      * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
      */
     handleVirtualPolygonClick({ virtualPolygon }) {
-        this.lastClickedVirtualPolygon = virtualPolygon;
-        this.modularProjector.handleVirtualPolygonClick({ virtualPolygon });
-    }
+        if (!this.viewer) return;
 
-    /**
-     * Cast both real and virtual projections (legacy method)
-     * @param {Object} config
-     * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
-     */
-    castRealAndVirtualProjections({ virtualPolygon }) {
-        this.lastClickedVirtualPolygon = virtualPolygon;
+        // Check if projection is valid before creating
+        if (!this.isValidProjection({ virtualPolygon })) {
+            return;
+        }
+
+        // Toggle projections for this specific polygon
+        const wasActive = this.hasProjections({ virtualPolygon });
         
-        if (this.modularProjector.isValidProjection({ virtualPolygon })) {
-            this.modularProjector.createProjections({ virtualPolygon });
+        if (wasActive) {
+            // Remove projections
+            this.removeProjections({ virtualPolygon });
+            this.triggerEvent({ eventName: 'onProjectionRemoved', data: { virtualPolygon } });
+        } else {
+            // Create projections
+            this.createProjections({ virtualPolygon });
+            this.triggerEvent({ eventName: 'onProjectionCreated', data: { virtualPolygon } });
         }
     }
 
     /**
-     * Update beams (legacy method name)
-     */
-    updateBeams() {
-        this.modularProjector.updateAllProjections();
-    }
-
-    /**
-     * Clear all beams (legacy method name)
-     */
-    clearAllBeams() {
-        this.modularProjector.clearAllProjections();
-        this.lastClickedVirtualPolygon = null;
-    }
-
-    // ============================================
-    // LEGACY PROPERTY ACCESS
-    // ============================================
-
-    /**
-     * Get virtual projections (legacy compatibility)
-     * @returns {Array} Array of virtual projection objects
-     */
-    get virtualProjections() {
-        return this.modularProjector.getVirtualManager().getAllProjections();
-    }
-
-    /**
-     * Get real projections (legacy compatibility)
-     * @returns {Array} Array of real projection objects
-     */
-    get realProjections() {
-        return this.modularProjector.getRealManager().getAllProjections();
-    }
-
-    // ============================================
-    // NEW METHODS (pass-through to modular system)
-    // ============================================
-
-    /**
-     * Update all projections (new method name)
-     */
-    updateAllProjections() {
-        this.modularProjector.updateAllProjections();
-    }
-
-    /**
-     * Clear all projections (new method name)
-     */
-    clearAllProjections() {
-        this.modularProjector.clearAllProjections();
-        this.lastClickedVirtualPolygon = null;
-    }
-
-    /**
-     * Check if projections exist for a polygon
+     * Create both virtual and real projections for a polygon
      * @param {Object} config
      * @param {Object} config.virtualPolygon - The virtual polygon
-     * @returns {boolean} True if projections exist
+     * @returns {Object} Created projections { virtual, real }
+     */
+    createProjections({ virtualPolygon }) {
+        const virtualProjection = this.virtualManager.createProjection({ virtualPolygon, viewer: this.viewer });
+        const realProjection = this.realManager.createProjection({ virtualPolygon, viewer: this.viewer });
+        
+        return {
+            virtual: virtualProjection,
+            real: realProjection
+        };
+    }
+
+    /**
+     * Remove both virtual and real projections for a polygon
+     * @param {Object} config
+     * @param {Object} config.virtualPolygon - The virtual polygon
+     * @returns {Object} Removal results { virtual, real }
+     */
+    removeProjections({ virtualPolygon }) {
+        const virtualRemoved = this.virtualManager.removeProjection({ virtualPolygon });
+        const realRemoved = this.realManager.removeProjection({ virtualPolygon });
+        
+        return {
+            virtual: virtualRemoved,
+            real: realRemoved
+        };
+    }
+
+    /**
+     * Update all active projections when scene elements are dragged
+     * Removes projections that are no longer valid after changes
+     */
+    updateAllProjections() {
+        if (!this.viewer) return;
+
+        // Get all active polygons (use virtual manager as authoritative source)
+        const activePolygons = this.virtualManager.getActivePolygons();
+        
+        for (const virtualPolygon of activePolygons) {
+            if (this.isValidProjection({ virtualPolygon })) {
+                // Update both virtual and real projections
+                this.virtualManager.updateProjection({ virtualPolygon, viewer: this.viewer });
+                this.realManager.updateProjection({ virtualPolygon, viewer: this.viewer });
+                this.triggerEvent({ eventName: 'onProjectionUpdated', data: { virtualPolygon } });
+            } else {
+                // Remove invalid projections
+                this.removeProjections({ virtualPolygon });
+                this.triggerEvent({ eventName: 'onProjectionRemoved', data: { virtualPolygon } });
+            }
+        }
+    }
+
+    /**
+     * Check if a polygon has active projections
+     * @param {Object} config
+     * @param {Object} config.virtualPolygon - The virtual polygon
+     * @returns {boolean} True if polygon has projections
      */
     hasProjections({ virtualPolygon }) {
-        return this.modularProjector.hasProjections({ virtualPolygon });
+        return this.virtualManager.hasProjection({ virtualPolygon }) || 
+               this.realManager.hasProjection({ virtualPolygon });
+    }
+
+    /**
+     * Clear all projections
+     */
+    clearAllProjections() {
+        this.virtualManager.clearAll();
+        this.realManager.clearAll();
     }
 
     /**
      * Get projection statistics
-     * @returns {Object} Projection statistics
+     * @returns {Object} Statistics about active projections
      */
     getProjectionStats() {
-        return this.modularProjector.getProjectionStats();
+        return {
+            virtualCount: this.virtualManager.getProjectionCount(),
+            realCount: this.realManager.getProjectionCount(),
+            activePolygons: this.virtualManager.getActivePolygons(),
+            totalProjections: this.virtualManager.getProjectionCount() + this.realManager.getProjectionCount()
+        };
+    }
+
+    // ============================================
+    // VALIDATION AND UTILITIES
+    // ============================================
+
+    /**
+     * Validate if a projection is valid (endpoint reaches viewer)
+     * @param {Object} config
+     * @param {Object} config.virtualPolygon - The virtual polygon
+     * @returns {boolean} True if projection is valid
+     */
+    isValidProjection({ virtualPolygon }) {
+        const realPath = calculateRealProjectionPath({
+            virtualPolygon,
+            viewer: this.viewer,
+            lightBeamEngine: this.lightBeamEngine,
+            mirrors: this.mirrors
+        });
+        
+        if (!realPath) return false;
+        
+        return validateProjectionEndpoint({
+            projectionPath: realPath,
+            viewer: this.viewer,
+            lightBeamEngine: this.lightBeamEngine,
+            mirrors: this.mirrors,
+            tolerance: this.beamConfig.virtualBeam.tolerance
+        });
+    }
+
+    // ============================================
+    // EVENT SYSTEM
+    // ============================================
+
+    /**
+     * Set event handler for projection lifecycle events
+     * @param {Object} config
+     * @param {string} config.eventName - Event name (onProjectionCreated, onProjectionRemoved, onProjectionUpdated)
+     * @param {Function} config.handler - Event handler function
+     */
+    setEventHandler({ eventName, handler }) {
+        if (this.eventHandlers.hasOwnProperty(eventName)) {
+            this.eventHandlers[eventName] = handler;
+        }
     }
 
     /**
-     * Access the underlying modular projector
-     * @returns {ModularLightBeamProjector} The modular projector instance
+     * Trigger an event if handler is set
+     * @param {Object} config
+     * @param {string} config.eventName - Event name
+     * @param {Object} config.data - Event data
      */
-    getModularProjector() {
-        return this.modularProjector;
+    triggerEvent({ eventName, data }) {
+        const handler = this.eventHandlers[eventName];
+        if (handler && typeof handler === 'function') {
+            handler(data);
+        }
     }
 
     // ============================================
-    // LEGACY METHODS (maintained for compatibility but deprecated)
+    // MANAGER ACCESS (for advanced use cases)
     // ============================================
 
-    castVirtualProjection({ virtualPolygon }) {
-        console.warn('castVirtualProjection is deprecated. Use createProjections() instead.');
-        this.modularProjector.getVirtualManager().createProjection({ virtualPolygon, viewer: this.viewer });
+    /**
+     * Get direct access to virtual projection manager
+     * @returns {VirtualProjectionManager} Virtual projection manager
+     */
+    getVirtualManager() {
+        return this.virtualManager;
     }
 
-    castRealProjection({ virtualPolygon }) {
-        console.warn('castRealProjection is deprecated. Use createProjections() instead.');
-        this.modularProjector.getRealManager().createProjection({ virtualPolygon, viewer: this.viewer });
-    }
-
-    clearVirtualProjections() {
-        console.warn('clearVirtualProjections is deprecated. Use clearAllProjections() instead.');
-        this.modularProjector.getVirtualManager().clearAll();
-    }
-
-    clearRealBeams() {
-        console.warn('clearRealBeams is deprecated. Use clearAllProjections() instead.');
-        this.modularProjector.getRealManager().clearAll();
-    }
-
-    isProjectionEndpointAtViewer({ virtualPolygon }) {
-        console.warn('isProjectionEndpointAtViewer is deprecated. Use modular system validation.');
-        return this.modularProjector.isValidProjection({ virtualPolygon });
+    /**
+     * Get direct access to real projection manager
+     * @returns {RealProjectionManager} Real projection manager
+     */
+    getRealManager() {
+        return this.realManager;
     }
 }

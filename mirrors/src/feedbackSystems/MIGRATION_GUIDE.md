@@ -12,7 +12,7 @@ The LightBeamProjector has been refactored into a modular, extensible architectu
 
 ### Components
 
-1. **ModularLightBeamProjector** - Main coordinator class
+1. **LightBeamProjector** - Main coordinator class (refactored from the original)
 2. **VirtualProjectionManager** - Manages virtual projections
 3. **RealProjectionManager** - Manages real projections  
 4. **ProjectionGeometry** - Pure functions for calculations
@@ -36,7 +36,7 @@ import { LightBeamProjector } from './src/feedbackSystems/LightBeamProjector.js'
 
 **After:**
 ```javascript
-import { ModularLightBeamProjector } from './src/feedbackSystems/ModularLightBeamProjector.js';
+import { LightBeamProjector } from './src/feedbackSystems/LightBeamProjector.js';
 ```
 
 ### 2. Constructor (No Changes Required)
@@ -44,7 +44,7 @@ import { ModularLightBeamProjector } from './src/feedbackSystems/ModularLightBea
 The constructor interface remains the same:
 
 ```javascript
-const projector = new ModularLightBeamProjector({
+const projector = new LightBeamProjector({
     svgCanvas,
     viewer,
     lightBeamEngine,
@@ -159,14 +159,14 @@ import { calculateVirtualProjectionPath } from './geometry/ProjectionGeometry.js
 const virtualManager = new VirtualProjectionManager({ svgCanvas, beamConfig });
 
 // Test coordination logic
-const projector = new ModularLightBeamProjector(config);
+const projector = new LightBeamProjector(config);
 ```
 
 ### Integration Testing
 
 ```javascript
 // Test full workflow
-const projector = new ModularLightBeamProjector(config);
+const projector = new LightBeamProjector(config);
 projector.handleVirtualPolygonClick({ virtualPolygon });
 expect(projector.hasProjections({ virtualPolygon })).toBe(true);
 

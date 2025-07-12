@@ -12,7 +12,7 @@
 1. **`ProjectionGeometry.js`** - Pure functions for all geometric calculations
 2. **`VirtualProjectionManager.js`** - Manages virtual projection lifecycle with per-polygon state
 3. **`RealProjectionManager.js`** - Manages real projection lifecycle with mirror reflections
-4. **`ModularLightBeamProjector.js`** - Main coordinator class with event system
+4. **`LightBeamProjector.js`** - Main coordinator class with event system (refactored)
 
 ### Compatibility & Documentation
 5. **`LightBeamProjector.js`** - Updated as compatibility wrapper (maintains original API)
@@ -34,7 +34,7 @@ LightBeamProjector
 
 ### After (Modular)
 ```
-ModularLightBeamProjector (Coordinator)
+LightBeamProjector (Coordinator)
 ├── VirtualProjectionManager (Virtual beams)
 ├── RealProjectionManager (Real beams)
 ├── ProjectionGeometry (Pure functions)
@@ -143,7 +143,7 @@ const realManager = projector.getRealManager();
 3. Use new features like `hasProjections()` and statistics
 
 ### Full Migration
-- Switch to `ModularLightBeamProjector` for new projects
+- Use the refactored `LightBeamProjector` which now contains all the modular functionality
 - Access individual managers for advanced control
 - Implement custom event handling
 
