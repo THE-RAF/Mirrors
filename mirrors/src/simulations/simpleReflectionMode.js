@@ -53,7 +53,7 @@ export class SimpleReflectionMode {
         this.createMirrorsFromConfig();
         this.createViewersFromConfig();
         this.createLightBeamsFromConfig();
-        this.createVirtualLightCaster();
+        this.createLightBeamProjector();
         this.reflectionEngine.createReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
         this.setupSceneUpdates();
     }
@@ -127,12 +127,14 @@ export class SimpleReflectionMode {
     }
 
     /**
-     * Create virtual light caster
+     * Create light beam projector
      */
-    createVirtualLightCaster() {
+    createLightBeamProjector() {
         this.virtualLightCaster = new LightBeamProjector({
             svgCanvas: this.svgCanvas,
-            viewer: this.viewers[0]
+            viewer: this.viewers[0],
+            lightBeamEngine: this.lightBeamEngine,
+            mirrors: this.mirrors
         });
     }
 

@@ -47,25 +47,25 @@ export const sceneEntities = {
         }
     ],
     lightBeams: [
-        {
-            // Horizontal beam from left
-            emissionPoint: { x: 150, y: 400 },
-            directorVector: { x: 1, y: 0 },
-            maxLength: 800,
-            strokeColor: '#ffdd00',
-            strokeWidth: 2,
-            animated: true,
-            animationDuration: 1000
-        },
-        {
-            // Diagonal beam from bottom left
-            emissionPoint: { x: 200, y: 500 },
-            directorVector: { x: 0.8, y: -0.6 },
-            maxLength: 600,
-            strokeColor: '#00ff88',
-            strokeWidth: 2,
-            animated: true,
-            animationDuration: 1000
-        }
+        // {
+        //     // Horizontal beam from left
+        //     emissionPoint: { x: 150, y: 400 },
+        //     directorVector: { x: 1, y: 0 },
+        //     maxLength: 800,
+        //     strokeColor: '#ffdd00',
+        //     strokeWidth: 2,
+        //     animated: true,
+        //     animationDuration: 1000
+        // },
+        // {
+        //     // Diagonal beam from bottom left
+        //     emissionPoint: { x: 200, y: 500 },
+        //     directorVector: { x: 0.8, y: -0.6 },
+        //     maxLength: 600,
+        //     strokeColor: '#00ff88',
+        //     strokeWidth: 2,
+        //     animated: true,
+        //     animationDuration: 1000
+        // }
     ]
 };
