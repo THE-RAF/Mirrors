@@ -166,15 +166,23 @@ export class SimpleReflectionMode {
     }
 
     /**
-     * Set up efficient scene updating during dragging
+     * Set up efficient scene updating during dragging with throttling
      */
     setupSceneUpdates() {
+        let updateScheduled = false;
+        
         document.addEventListener('mousemove', () => {
             // Check if any real scene element is being dragged
-            if (this.isSceneBeingDragged()) {
-                this.reflectionEngine.updateReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
-                this.lightBeamEngine.updateAllLightBeamReflections({ mirrors: this.mirrors });
-                this.virtualLightCaster.updateAllProjections();
+            if (this.isSceneBeingDragged() && !updateScheduled) {
+                updateScheduled = true;
+                
+                // Use requestAnimationFrame to throttle updates to ~60fps max
+                requestAnimationFrame(() => {
+                    this.reflectionEngine.updateReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
+                    this.lightBeamEngine.updateAllLightBeamReflections({ mirrors: this.mirrors });
+                    this.virtualLightCaster.updateAllProjections();
+                    updateScheduled = false;
+                });
             }
         });
     }

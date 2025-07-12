@@ -104,30 +104,13 @@ export class RealProjectionManager {
             return false;
         }
 
-        // Create temporary beam to get updated reflection points
-        const tempProjection = this.lightBeamEngine.createLightBeam({
-            emissionPoint: pathData.emissionPoint,
-            directorVector: pathData.direction,
-            maxLength: pathData.length,
-            strokeColor: this.beamConfig.color,
-            strokeWidth: this.beamConfig.strokeWidth,
-            animated: false,
-            animationDuration: 0,
-            mirrors: this.mirrors
-        });
-
-        // Update existing projection
-        if (tempProjection && tempProjection.points) {
+        // Update existing projection using pure calculations (NO TEMPORARY BEAM CREATION!)
+        if (pathData.reflectionPath && pathData.reflectionPath.length >= 2) {
             projection.emissionPoint = pathData.emissionPoint;
             projection.directorVector = pathData.direction;
             projection.maxLength = pathData.length;
-            projection.points = [...tempProjection.points];
+            projection.points = [...pathData.reflectionPath];
             projection.updateBeamPath();
-        }
-
-        // Cleanup temporary projection
-        if (tempProjection && tempProjection.destroy) {
-            tempProjection.destroy();
         }
 
         return true;

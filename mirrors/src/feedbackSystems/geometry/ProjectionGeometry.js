@@ -55,22 +55,15 @@ export function calculateRealProjectionPath({ virtualPolygon, viewer, lightBeamE
     const normalizedReverseDirection = normalizeVector({ vector: reverseDirection });
     const projectionLength = vectorLength({ vector: reverseDirection });
     
-    // Create temporary beam to calculate reflection path
-    const tempBeam = lightBeamEngine.createLightBeam({
+    // Use pure geometry calculation
+    const reflectionPoints = lightBeamEngine.calculateReflectionPath({
         emissionPoint: { x: viewer.x, y: viewer.y },
         directorVector: normalizedReverseDirection,
-        maxLength: projectionLength,
-        strokeColor: '#temp',
-        strokeWidth: 1,
-        animated: false,
-        animationDuration: 0,
-        mirrors
+        mirrors,
+        maxLength: projectionLength
     });
     
-    let realProjectionData = null;
-    
-    if (tempBeam && tempBeam.points && tempBeam.points.length >= 2) {
-        const reflectionPoints = tempBeam.points;
+    if (reflectionPoints && reflectionPoints.length >= 2) {
         const lastPoint = reflectionPoints[reflectionPoints.length - 1];
         const secondLastPoint = reflectionPoints[reflectionPoints.length - 2];
         
@@ -84,7 +77,7 @@ export function calculateRealProjectionPath({ virtualPolygon, viewer, lightBeamE
             vector: { x: -segmentDirection.x, y: -segmentDirection.y }
         });
         
-        realProjectionData = {
+        return {
             emissionPoint: realCenter,
             direction: realDirection,
             length: projectionLength,
@@ -92,12 +85,7 @@ export function calculateRealProjectionPath({ virtualPolygon, viewer, lightBeamE
         };
     }
     
-    // Cleanup temporary beam
-    if (tempBeam && tempBeam.destroy) {
-        tempBeam.destroy();
-    }
-    
-    return realProjectionData;
+    return null;
 }
 
 /**
