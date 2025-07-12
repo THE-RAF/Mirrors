@@ -42,6 +42,7 @@ export class LightBeamProjector {
 
     /**
      * Cast virtual light beam from virtual polygon center to the viewer
+     * Only casts beams if the reflection is valid (endpoint matches viewer)
      * @param {Object} config
      * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
      */
@@ -51,18 +52,28 @@ export class LightBeamProjector {
         this.lastClickedVirtualPolygon = virtualPolygon;
         this.clearAllBeams();
         
-        this.castVirtualBeam({ virtualPolygon });
-        this.castRealBeam({ virtualPolygon });
+        // Only cast beams if reflection is valid
+        if (this.isBeamEndpointAtViewer({ virtualPolygon })) {
+            this.castVirtualBeam({ virtualPolygon });
+            this.castRealBeam({ virtualPolygon });
+        }
     }
 
     /**
      * Update both virtual and real beams when scene elements are dragged
+     * Only updates beams if the reflection is still valid, clears them otherwise
      */
     updateBeams() {
         if (!this.lastClickedVirtualPolygon || !this.viewer) return;
 
-        this.updateVirtualBeam();
-        this.updateRealBeam();
+        // Check if reflection is still valid after dragging
+        if (this.isBeamEndpointAtViewer({ virtualPolygon: this.lastClickedVirtualPolygon })) {
+            this.updateVirtualBeam();
+            this.updateRealBeam();
+        } else {
+            // Clear beams if reflection is no longer valid
+            this.clearAllBeams();
+        }
     }
 
     /**
@@ -346,5 +357,51 @@ export class LightBeamProjector {
             animationDuration: LightBeamProjector.REAL_ANIMATION_DURATION,
             mirrors: this.mirrors
         };
+    }
+
+    // ============================================
+    // VALIDATION HELPERS
+    // ============================================
+
+    /**
+     * Check if the real beam endpoint is close enough to the viewer center
+     * @param {Object} config
+     * @param {VirtualPolygon} config.virtualPolygon - The virtual polygon
+     * @returns {boolean} True if beam endpoint matches viewer position
+     */
+    isBeamEndpointAtViewer({ virtualPolygon }) {
+        const directorVector = this.getPolygonBeamDirectorVector({ virtualPolygon });
+        if (!directorVector) return false;
+
+        const { beamLength, realPolygonCenter } = this.calculateRealBeamProperties({ virtualPolygon });
+        
+        // Create temporary beam to get reflection path
+        const tempBeam = this.lightBeamEngine.createLightBeam({
+            emissionPoint: realPolygonCenter,
+            directorVector: directorVector,
+            maxLength: beamLength,
+            strokeColor: LightBeamProjector.REAL_BEAM_COLOR,
+            strokeWidth: LightBeamProjector.BEAM_STROKE_WIDTH,
+            animated: false,
+            animationDuration: 0,
+            mirrors: this.mirrors
+        });
+
+        let isValid = false;
+        if (tempBeam && tempBeam.points && tempBeam.points.length > 0) {
+            const endpoint = tempBeam.points[tempBeam.points.length - 1];
+            const distance = Math.sqrt(
+                Math.pow(endpoint.x - this.viewer.x, 2) + 
+                Math.pow(endpoint.y - this.viewer.y, 2)
+            );
+            isValid = distance < 10; // Allow 10px tolerance
+        }
+
+        // Cleanup
+        if (tempBeam && tempBeam.destroy) {
+            tempBeam.destroy();
+        }
+
+        return isValid;
     }
 }
