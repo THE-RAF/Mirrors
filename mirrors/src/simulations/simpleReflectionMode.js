@@ -32,6 +32,9 @@ export class SimpleReflectionMode {
         this.mirrors = [];
         this.viewers = [];
         
+        // Initialize layers first
+        this.createSVGLayers();
+        
         // Initialize engines
         this.reflectionEngine = new ReflectionEngine({ 
             svgCanvas,
@@ -39,7 +42,7 @@ export class SimpleReflectionMode {
                 this.handleVirtualPolygonClick({ virtualPolygon });
             }
         });
-        this.lightBeamEngine = new LightBeamEngine({ svgCanvas });
+        this.lightBeamEngine = new LightBeamEngine({ svgCanvas: this.beamLayer });
         
         // Initialize virtual light caster (will be set after viewers are created)
         this.virtualLightCaster = null;
@@ -59,6 +62,21 @@ export class SimpleReflectionMode {
     }
 
     /**
+     * Create SVG layer groups for proper z-ordering
+     */
+    createSVGLayers() {
+        // Create background layer for light beams
+        this.beamLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        this.beamLayer.setAttribute('class', 'beam-layer');
+        this.svgCanvas.appendChild(this.beamLayer);
+
+        // Create foreground layer for objects (polygons, mirrors, viewers)
+        this.objectLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        this.objectLayer.setAttribute('class', 'object-layer');
+        this.svgCanvas.appendChild(this.objectLayer);
+    }
+
+    /**
      * Create Polygon instances and their SVG elements from configuration
      */
     createPolygonsFromConfig() {
@@ -66,7 +84,7 @@ export class SimpleReflectionMode {
             const polygon = new Polygon({
                 vertices: objConfig.vertices,
                 fill: objConfig.fill,
-                parentSvg: this.svgCanvas,
+                parentSvg: this.objectLayer,
                 draggable: this.modeConfig.interaction?.draggablePolygons ?? true
             });
             
@@ -84,7 +102,7 @@ export class SimpleReflectionMode {
                 y1: mirrorConfig.y1,
                 x2: mirrorConfig.x2,
                 y2: mirrorConfig.y2,
-                parentSvg: this.svgCanvas,
+                parentSvg: this.objectLayer,
                 draggable: this.modeConfig.interaction?.draggableMirrors ?? true
             })
         );
@@ -102,7 +120,7 @@ export class SimpleReflectionMode {
                 fill: viewerConfig.fill || '#4a90e2',
                 stroke: viewerConfig.stroke || '#333',
                 strokeWidth: viewerConfig.strokeWidth || 2,
-                parentSvg: this.svgCanvas,
+                parentSvg: this.objectLayer,
                 draggable: this.modeConfig.interaction?.draggableViewers ?? true
             })
         );
@@ -131,7 +149,7 @@ export class SimpleReflectionMode {
      */
     createLightBeamProjector() {
         this.virtualLightCaster = new LightBeamProjector({
-            svgCanvas: this.svgCanvas,
+            svgCanvas: this.beamLayer,
             viewer: this.viewers[0],
             lightBeamEngine: this.lightBeamEngine,
             mirrors: this.mirrors,
@@ -192,6 +210,14 @@ export class SimpleReflectionMode {
         this.reflectionEngine.destroy();
         this.lightBeamEngine.destroy();
         this.virtualLightCaster.clearVirtualBeams();
+        
+        // Clean up SVG layers
+        if (this.beamLayer?.parentNode) {
+            this.beamLayer.parentNode.removeChild(this.beamLayer);
+        }
+        if (this.objectLayer?.parentNode) {
+            this.objectLayer.parentNode.removeChild(this.objectLayer);
+        }
         
         // Clear arrays
         this.polygons = [];
