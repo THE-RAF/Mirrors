@@ -10,6 +10,24 @@ import { ReflectionEngine } from '../engines/ReflectionEngine.js';
 import { LightBeamEngine } from '../engines/LightBeamEngine.js';
 import { LightBeamProjector } from '../feedbackSystems/lightBeamProjector/LightBeamProjector.js';
 
+// Constants
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+const DEFAULT_VALUES = {
+    viewer: {
+        radius: 8,
+        fill: '#4a90e2',
+        stroke: '#333',
+        strokeWidth: 2
+    },
+    lightBeam: {
+        maxLength: 800,
+        strokeColor: '#ffdd00',
+        strokeWidth: 2,
+        animationDuration: 1000
+    }
+};
+
 /**
  * @class SimpleReflectionMode
  * Minimal simulation engine for managing polygon objects in SVG
@@ -22,78 +40,115 @@ export class SimpleReflectionMode {
      * @param {SVGElement} config.svgCanvas - SVG element for rendering
      */
     constructor({ sceneEntities, modeConfig, svgCanvas }) {
-        this.objectConfigs = sceneEntities.objects || [];
+        // Store configuration
+        this.polygonConfigs = sceneEntities.objects || [];
         this.mirrorConfigs = sceneEntities.mirrors || [];
         this.viewerConfigs = sceneEntities.viewers || [];
         this.lightBeamConfigs = sceneEntities.lightBeams || [];
         this.modeConfig = modeConfig;
         this.svgCanvas = svgCanvas;
+        
+        // Initialize entity arrays
         this.polygons = [];
         this.mirrors = [];
         this.viewers = [];
         
         // Initialize layers first
-        this.createSVGLayers();
+        this.initializeSVGLayers();
         
         // Initialize engines
         this.reflectionEngine = new ReflectionEngine({ 
-            svgCanvas: this.virtualLayer,  // Virtual objects go to virtual layer
+            svgCanvas: this.middleLayer,  // Virtual objects go to middle layer
             onVirtualPolygonClick: (virtualPolygon, event) => {
                 this.handleVirtualPolygonClick({ virtualPolygon });
             },
             virtualPolygonsClickable: this.modeConfig.lightBeamProjector.enabled
         });
-        this.lightBeamEngine = new LightBeamEngine({ svgCanvas: this.beamLayer });
+        this.lightBeamEngine = new LightBeamEngine({ svgCanvas: this.backgroundLayer });
         
-        // Initialize virtual light caster (will be set after viewers are created)
-        this.virtualLightCaster = null;
+        // Initialize systems (will be set after entities are created)
+        this.lightBeamProjector = null;
     }
     
     /**
      * Initialize the simulation environment and create all entities
      */
     init() {
-        this.createPolygonsFromConfig();
-        this.createMirrorsFromConfig();
-        this.createViewersFromConfig();
-        this.createLightBeamsFromConfig();
-        this.createLightBeamProjector();
-        this.reflectionEngine.createReflections({ polygons: this.polygons, viewers: this.viewers, mirrors: this.mirrors });
-        this.setupSceneUpdates();
+        try {
+            this.initializeEntities();
+            this.initializeSystems();
+            this.setupSceneUpdates();
+        } catch (error) {
+            console.error('Failed to initialize SimpleReflectionMode:', error);
+            throw error;
+        }
     }
 
     /**
-     * Create SVG layer groups for proper z-ordering
+     * Initialize all simulation entities in correct order
      */
-    createSVGLayers() {
-        // Create background layer for light beams (bottom layer)
-        this.beamLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        this.beamLayer.setAttribute('class', 'beam-layer');
-        this.svgCanvas.appendChild(this.beamLayer);
+    initializeEntities() {
+        this.initializePolygons();
+        this.initializeMirrors();
+        this.initializeViewers();
+        this.initializeLightBeams();
+    }
 
-        // Create middle layer for virtual objects (virtual polygons, virtual mirrors, virtual viewers)
-        this.virtualLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        this.virtualLayer.setAttribute('class', 'virtual-layer');
-        this.svgCanvas.appendChild(this.virtualLayer);
+    /**
+     * Initialize simulation systems and components
+     */
+    initializeSystems() {
+        this.initializeReflections();
+        this.initializeLightBeamProjector();
+    }
 
-        // Create foreground layer for real objects (real polygons, real mirrors, real viewers) - top layer
-        this.realLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        this.realLayer.setAttribute('class', 'real-layer');
-        this.svgCanvas.appendChild(this.realLayer);
+    /**
+     * Initialize reflection system
+     */
+    initializeReflections() {
+        this.reflectionEngine.createReflections({ 
+            polygons: this.polygons, 
+            viewers: this.viewers, 
+            mirrors: this.mirrors 
+        });
+    }
+
+    /**
+     * Initialize SVG layer groups for proper z-ordering
+     * Layers are created in order: background (bottom) → middle → foreground (top)
+     */
+    initializeSVGLayers() {
+        // Create background layer (for light beams)
+        this.backgroundLayer = this.createSVGLayer('background-layer');
         
-        // Keep objectLayer as an alias to realLayer for backward compatibility
-        this.objectLayer = this.realLayer;
+        // Create middle layer (for reflections and virtual objects)
+        this.middleLayer = this.createSVGLayer('middle-layer');
+        
+        // Create foreground layer (for real polygons, mirrors, viewers)
+        this.foregroundLayer = this.createSVGLayer('foreground-layer');
     }
 
     /**
-     * Create Polygon instances and their SVG elements from configuration
+     * Create and append a single SVG layer group
+     * @param {string} className - CSS class name for the layer
+     * @returns {SVGGElement} The created layer element
      */
-    createPolygonsFromConfig() {
-        this.polygons = this.objectConfigs.map(objConfig => {
+    createSVGLayer(className) {
+        const layer = document.createElementNS(SVG_NAMESPACE, 'g');
+        layer.setAttribute('class', className);
+        this.svgCanvas.appendChild(layer);
+        return layer;
+    }
+
+    /**
+     * Initialize polygon entities from configuration
+     */
+    initializePolygons() {
+        this.polygons = this.polygonConfigs.map(polygonConfig => {
             const polygon = new Polygon({
-                vertices: objConfig.vertices,
-                fill: objConfig.fill,
-                parentSvg: this.objectLayer,
+                vertices: polygonConfig.vertices,
+                fill: polygonConfig.fill,
+                parentSvg: this.foregroundLayer,
                 draggable: this.modeConfig.interaction?.draggablePolygons ?? true
             });
             
@@ -102,76 +157,76 @@ export class SimpleReflectionMode {
     }
 
     /**
-     * Create Mirror instances and their SVG elements from configuration
+     * Initialize mirror entities from configuration
      */
-    createMirrorsFromConfig() {
+    initializeMirrors() {
         this.mirrors = this.mirrorConfigs.map(mirrorConfig =>
             new Mirror({
                 x1: mirrorConfig.x1,
                 y1: mirrorConfig.y1,
                 x2: mirrorConfig.x2,
                 y2: mirrorConfig.y2,
-                parentSvg: this.objectLayer,
+                parentSvg: this.foregroundLayer,
                 draggable: this.modeConfig.interaction?.draggableMirrors ?? true
             })
         );
     }
 
     /**
-     * Create Viewer instances and their SVG elements from configuration
+     * Initialize viewer entities from configuration
      */
-    createViewersFromConfig() {
+    initializeViewers() {
         this.viewers = this.viewerConfigs.map(viewerConfig =>
             new Viewer({
                 x: viewerConfig.x,
                 y: viewerConfig.y,
-                radius: viewerConfig.radius || 8,
-                fill: viewerConfig.fill || '#4a90e2',
-                stroke: viewerConfig.stroke || '#333',
-                strokeWidth: viewerConfig.strokeWidth || 2,
-                parentSvg: this.objectLayer,
+                radius: viewerConfig.radius || DEFAULT_VALUES.viewer.radius,
+                fill: viewerConfig.fill || DEFAULT_VALUES.viewer.fill,
+                stroke: viewerConfig.stroke || DEFAULT_VALUES.viewer.stroke,
+                strokeWidth: viewerConfig.strokeWidth || DEFAULT_VALUES.viewer.strokeWidth,
+                parentSvg: this.foregroundLayer,
                 draggable: this.modeConfig.interaction?.draggableViewers ?? true
             })
         );
     }
 
     /**
-     * Create LightBeam instances from configuration
+     * Initialize light beam entities from configuration
      */
-    createLightBeamsFromConfig() {
+    initializeLightBeams() {
         this.lightBeamConfigs.forEach(beamConfig => {
             this.lightBeamEngine.createLightBeam({
                 emissionPoint: beamConfig.emissionPoint,
                 directorVector: beamConfig.directorVector,
-                maxLength: beamConfig.maxLength || 800,
-                strokeColor: beamConfig.strokeColor || '#ffdd00',
-                strokeWidth: beamConfig.strokeWidth || 2,
+                maxLength: beamConfig.maxLength || DEFAULT_VALUES.lightBeam.maxLength,
+                strokeColor: beamConfig.strokeColor || DEFAULT_VALUES.lightBeam.strokeColor,
+                strokeWidth: beamConfig.strokeWidth || DEFAULT_VALUES.lightBeam.strokeWidth,
                 animated: beamConfig.animated ?? true,
-                animationDuration: beamConfig.animationDuration || 1000,
+                animationDuration: beamConfig.animationDuration || DEFAULT_VALUES.lightBeam.animationDuration,
                 mirrors: this.mirrors
             });
         });
     }
 
     /**
-     * Create light beam projector (if enabled in config)
+     * Initialize light beam projector system (if enabled in config)
      */
-    createLightBeamProjector() {
+    initializeLightBeamProjector() {
         if (this.modeConfig.lightBeamProjector.enabled) {
-            this.virtualLightCaster = new LightBeamProjector({
-                svgCanvas: this.beamLayer,
+            this.lightBeamProjector = new LightBeamProjector({
+                svgCanvas: this.backgroundLayer,
                 viewer: this.viewers[0],
                 lightBeamEngine: this.lightBeamEngine,
                 mirrors: this.mirrors,
                 beamConfig: this.modeConfig.lightBeamProjector.config
             });
         } else {
-            this.virtualLightCaster = null;
+            this.lightBeamProjector = null;
         }
     }
 
     /**
-     * Set up efficient scene updating during dragging with throttling
+     * Set up drag update handler with throttling for performance
      */
     setupSceneUpdates() {
         let updateScheduled = false;
@@ -187,8 +242,8 @@ export class SimpleReflectionMode {
                     this.lightBeamEngine.updateAllLightBeamReflections({ mirrors: this.mirrors });
                     
                     // Only update projections if projector is enabled
-                    if (this.virtualLightCaster) {
-                        this.virtualLightCaster.updateAllProjections();
+                    if (this.lightBeamProjector) {
+                        this.lightBeamProjector.updateAllProjections();
                     }
                     
                     updateScheduled = false;
@@ -202,26 +257,20 @@ export class SimpleReflectionMode {
      * @returns {boolean} True if any polygon, mirror, or viewer is being dragged
      */
     isSceneBeingDragged() {
-        // Check if any polygon is being dragged
-        const polygonDragging = this.polygons.some(polygon => polygon.isDragging);
-        
-        // Check if any mirror is being dragged
-        const mirrorDragging = this.mirrors.some(mirror => mirror.isDragging);
-        
-        // Check if any viewer is being dragged
-        const viewerDragging = this.viewers.some(viewer => viewer.isDragging);
-        
-        return polygonDragging || mirrorDragging || viewerDragging;
+        const entityGroups = [this.polygons, this.mirrors, this.viewers];
+        return entityGroups.some(group => 
+            group.some(entity => entity.isDragging)
+        );
     }
 
     /**
-     * Handle virtual polygon click
+     * Handle virtual polygon click for light beam projection
      * @param {Object} config
      * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
      */
     handleVirtualPolygonClick({ virtualPolygon }) {
-        if (this.virtualLightCaster) {
-            this.virtualLightCaster.handleVirtualPolygonClick({ virtualPolygon });
+        if (this.lightBeamProjector) {
+            this.lightBeamProjector.handleVirtualPolygonClick({ virtualPolygon });
         }
     }
 
@@ -229,31 +278,67 @@ export class SimpleReflectionMode {
      * Clean up all simulation resources
      */
     destroy() {
-        // Destroy all entities
-        this.polygons.forEach(polygon => polygon.destroy());
-        this.mirrors.forEach(mirror => mirror.destroy());
-        this.viewers.forEach(viewer => viewer.destroy());
-        
-        // Destroy engines and virtual light caster (if exists)
-        this.reflectionEngine.destroy();
-        this.lightBeamEngine.destroy();
-        
-        if (this.virtualLightCaster) {
-            this.virtualLightCaster.clearAllProjections();
+        try {
+            this.destroyEntities();
+            this.destroyEngines();
+            this.destroySVGLayers();
+            this.clearEntityArrays();
+        } catch (error) {
+            console.error('Error during SimpleReflectionMode destruction:', error);
         }
+    }
+
+    /**
+     * Destroy all simulation entities
+     */
+    destroyEntities() {
+        const entityGroups = [this.polygons, this.mirrors, this.viewers];
+        entityGroups.forEach(group => {
+            group.forEach(entity => entity.destroy());
+        });
+    }
+
+    /**
+     * Destroy all engines and systems
+     */
+    destroyEngines() {
+        this.reflectionEngine?.destroy();
+        this.lightBeamEngine?.destroy();
         
-        // Clean up SVG layers
-        if (this.beamLayer?.parentNode) {
-            this.beamLayer.parentNode.removeChild(this.beamLayer);
+        if (this.lightBeamProjector) {
+            this.lightBeamProjector.clearAllProjections();
         }
-        if (this.virtualLayer?.parentNode) {
-            this.virtualLayer.parentNode.removeChild(this.virtualLayer);
-        }
-        if (this.realLayer?.parentNode) {
-            this.realLayer.parentNode.removeChild(this.realLayer);
-        }
+    }
+
+    /**
+     * Clean up SVG layers
+     */
+    destroySVGLayers() {
+        // Remove layers in reverse order (top to bottom)
+        this.removeSVGLayer(this.foregroundLayer);
+        this.removeSVGLayer(this.middleLayer);
+        this.removeSVGLayer(this.backgroundLayer);
         
-        // Clear arrays
+        // Clear references
+        this.backgroundLayer = null;
+        this.middleLayer = null;
+        this.foregroundLayer = null;
+    }
+
+    /**
+     * Safely remove a single SVG layer
+     * @param {SVGGElement} layer - The layer to remove
+     */
+    removeSVGLayer(layer) {
+        if (layer?.parentNode) {
+            layer.parentNode.removeChild(layer);
+        }
+    }
+
+    /**
+     * Clear entity arrays
+     */
+    clearEntityArrays() {
         this.polygons = [];
         this.mirrors = [];
         this.viewers = [];
