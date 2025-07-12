@@ -3,8 +3,8 @@
  * Handles all mathematical computations for light beam projections
  */
 
-import { calculatePolygonCenter } from '../../math/analyticalGeometry.js';
-import { normalizeVector, vectorLength } from '../../math/linearAlgebra.js';
+import { calculatePolygonCenter } from '../../../math/analyticalGeometry.js';
+import { normalizeVector, vectorLength } from '../../../math/linearAlgebra.js';
 
 /**
  * Calculate the virtual projection path from polygon to viewer

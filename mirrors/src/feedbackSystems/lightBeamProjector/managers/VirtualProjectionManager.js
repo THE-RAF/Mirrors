@@ -3,7 +3,7 @@
  * Handles creation, updating, and cleanup of virtual projections from polygons to viewer
  */
 
-import { VirtualLightBeam } from '../../basicEntities/virtual/VirtualLightBeam.js';
+import { VirtualLightBeam } from '../../../basicEntities/virtual/VirtualLightBeam.js';
 import { calculateVirtualProjectionPath } from '../geometry/ProjectionGeometry.js';
 
 /**
