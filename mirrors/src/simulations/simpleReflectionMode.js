@@ -202,7 +202,7 @@ export class SimpleReflectionMode {
      * @param {VirtualPolygon} config.virtualPolygon - The clicked virtual polygon
      */
     handleVirtualPolygonClick({ virtualPolygon }) {
-        this.virtualLightCaster.castVirtualBeamToViewer({ virtualPolygon });
+        this.virtualLightCaster.castRealAndVirtualProjections({ virtualPolygon });
     }
 
     /**
