@@ -16,7 +16,7 @@ export class Mirror {
      * @param {number} config.y2 - End y coordinate
      * @param {number} [config.thickness=4] - Mirror thickness in pixels
      * @param {string} [config.reflectiveColor='#888'] - Color of reflective side
-     * @param {string} [config.backColor='#000'] - Color of back side
+     * @param {string} [config.centerColor='#000'] - Color of center line
      * @param {SVGElement} config.parentSvg - Parent SVG container
      * @param {boolean} [config.draggable=true] - Whether the mirror can be dragged
      */
@@ -24,7 +24,7 @@ export class Mirror {
         x1, y1, x2, y2, 
         thickness = 5, 
         reflectiveColor = '#888', 
-        backColor = '#000', 
+        centerColor = '#000', 
         parentSvg, 
         draggable = true 
     }) {
@@ -34,7 +34,7 @@ export class Mirror {
         this.y2 = y2;
         this.thickness = thickness;
         this.reflectiveColor = reflectiveColor;
-        this.backColor = backColor;
+        this.centerColor = centerColor;
         this.draggable = draggable;
 
         // Internal configuration for 3-line mirror rendering
@@ -97,7 +97,7 @@ export class Mirror {
         });
         this.centerLine = this.createLine({ 
             offset: centerOffset, 
-            color: this.backColor, 
+            color: this.centerColor, 
             thickness: this.thickness * this.centerThicknessRatio 
         });
         
