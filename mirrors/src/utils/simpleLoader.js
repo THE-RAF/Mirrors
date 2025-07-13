@@ -3,8 +3,8 @@
  * Main exports: loadSceneAndCreateSimulation
  */
 
-import { SimpleReflectionMode } from '../simulations/simpleReflectionMode.js';
-import { InfiniteReflectionMode } from '../simulations/infiniteReflectionMode.js';
+import { SimpleReflectionMode } from '../simulationModes/simpleReflectionMode.js';
+import { InfiniteReflectionMode } from '../simulationModes/infiniteReflectionMode.js';
 
 // Scene imports
 import { basicReflection } from '../config/scenes/basicReflection.js';

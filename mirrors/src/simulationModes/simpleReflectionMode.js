@@ -3,12 +3,12 @@
  * Main exports: SimpleReflectionMode
  */
 
-import { Polygon } from '../basicEntities/real/Polygon.js';
-import { Mirror } from '../basicEntities/real/Mirror.js';
-import { Viewer } from '../basicEntities/real/Viewer.js';
-import { ReflectionEngine } from '../engines/ReflectionEngine.js';
-import { LightBeamEngine } from '../engines/LightBeamEngine.js';
-import { LightBeamProjector } from '../feedbackSystems/lightBeamProjector/LightBeamProjector.js';
+import { Polygon } from '../core/basicEntities/real/Polygon.js';
+import { Mirror } from '../core/basicEntities/real/Mirror.js';
+import { Viewer } from '../core/basicEntities/real/Viewer.js';
+import { ReflectionEngine } from '../core/engines/ReflectionEngine.js';
+import { LightBeamEngine } from '../core/engines/LightBeamEngine.js';
+import { LightBeamProjector } from '../core/feedbackSystems/lightBeamProjector/LightBeamProjector.js';
 
 // Constants
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
