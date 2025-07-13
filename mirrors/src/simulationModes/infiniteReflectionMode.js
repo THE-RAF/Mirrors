@@ -60,9 +60,6 @@ export class InfiniteReflectionMode {
      * @param {SVGElement} config.svgCanvas - SVG element for rendering
      */
     constructor({ sceneEntities, modeConfig, svgCanvas }) {
-        console.warn('⚠️  InfiniteReflectionMode: EXPERIMENTAL MODE INITIALIZED');
-        console.warn('Monitor performance and watch for warnings in the console.');
-        
         // Store configuration
         this.polygonConfigs = sceneEntities.objects || [];
         this.mirrorConfigs = sceneEntities.mirrors || [];
@@ -92,13 +89,6 @@ export class InfiniteReflectionMode {
         
         // Initialize systems (will be set after entities are created)
         this.lightBeamProjector = null;
-        
-        // Performance tracking
-        this.performanceStats = {
-            lastFrameTime: 0,
-            frameCount: 0,
-            avgFrameTime: 0
-        };
     }
     
     /**
@@ -109,7 +99,6 @@ export class InfiniteReflectionMode {
             this.initializeEntities();
             this.initializeSystems();
             this.setupSceneUpdates();
-            this.setupPerformanceMonitoring();
         } catch (error) {
             console.error('Failed to initialize InfiniteReflectionMode:', error);
             throw error;
@@ -144,18 +133,12 @@ export class InfiniteReflectionMode {
             ...this.modeConfig.infiniteReflections
         };
         
-        console.log('InfiniteReflectionMode: Initializing with config:', infiniteConfig);
-        
         this.infiniteReflectionEngine.createInfiniteReflections({ 
             polygons: this.polygons, 
             viewers: this.viewers, 
             mirrors: this.mirrors,
             infiniteConfig: infiniteConfig
         });
-        
-        // Log initial statistics
-        const stats = this.infiniteReflectionEngine.getStats();
-        console.log('InfiniteReflectionMode: Initial stats:', stats);
     }
 
     /**
@@ -284,8 +267,6 @@ export class InfiniteReflectionMode {
                 
                 // Use requestAnimationFrame to throttle updates to ~60fps max
                 requestAnimationFrame(() => {
-                    const startTime = performance.now();
-                    
                     // Update infinite reflections
                     const infiniteConfig = {
                         ...DEFAULT_VALUES.infiniteReflections,
@@ -306,48 +287,10 @@ export class InfiniteReflectionMode {
                         this.lightBeamProjector.updateAllProjections();
                     }
                     
-                    // Track performance
-                    const endTime = performance.now();
-                    this.updatePerformanceStats(endTime - startTime);
-                    
                     updateScheduled = false;
                 });
             }
         });
-    }
-
-    /**
-     * Set up performance monitoring
-     */
-    setupPerformanceMonitoring() {
-        // Log performance stats every 5 seconds
-        setInterval(() => {
-            const stats = this.infiniteReflectionEngine.getStats();
-            if (stats.enabled && this.performanceStats.frameCount > 0) {
-                console.log('InfiniteReflectionMode Performance:', {
-                    avgFrameTime: this.performanceStats.avgFrameTime.toFixed(2) + 'ms',
-                    virtualObjects: stats.totalVirtualPolygons + stats.totalVirtualViewers,
-                    maxDepth: stats.maxDepth,
-                    avgDepth: stats.avgDepth.toFixed(1)
-                });
-                
-                // Warn if performance is poor
-                if (this.performanceStats.avgFrameTime > 16) {
-                    console.warn('⚠️  Performance warning: Frame time exceeding 16ms. Consider reducing maxDepth or increasing minOpacity.');
-                }
-            }
-        }, 5000);
-    }
-
-    /**
-     * Update performance statistics
-     * @param {number} frameTime - Time taken for this frame in milliseconds
-     */
-    updatePerformanceStats(frameTime) {
-        this.performanceStats.frameCount++;
-        this.performanceStats.avgFrameTime = 
-            (this.performanceStats.avgFrameTime * (this.performanceStats.frameCount - 1) + frameTime) / 
-            this.performanceStats.frameCount;
     }
 
     /**
@@ -370,17 +313,6 @@ export class InfiniteReflectionMode {
         if (this.lightBeamProjector) {
             this.lightBeamProjector.handleVirtualPolygonClick({ virtualPolygon });
         }
-    }
-
-    /**
-     * Get current performance and reflection statistics
-     * @returns {Object} Combined statistics
-     */
-    getStats() {
-        return {
-            performance: this.performanceStats,
-            reflections: this.infiniteReflectionEngine.getStats()
-        };
     }
 
     /**

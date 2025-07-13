@@ -74,8 +74,6 @@ export class InfiniteReflectionEngine {
         // Performance optimization: skip if no mirrors
         if (mirrors.length === 0) return;
 
-        console.warn('⚠️  InfiniteReflectionEngine: Experimental feature enabled. Monitor performance and object counts.');
-
         // Create layer 0 references (real objects)
         const objectLayers = [
             {
@@ -115,13 +113,9 @@ export class InfiniteReflectionEngine {
             
             // Performance check: break if too many objects
             if (this.virtualPolygons.length > 1000) {
-                console.error('⚠️  InfiniteReflectionEngine: PERFORMANCE WARNING - Object limit (1000) reached! Stopping at depth', depth);
-                console.error('Consider reducing maxDepth, increasing fadeRate, or increasing minOpacity to improve performance.');
                 break;
             }
         }
-
-        console.log(`InfiniteReflectionEngine: Created ${this.virtualPolygons.length} virtual polygons and ${this.virtualViewers.length} virtual viewers`);
     }
 
     /**
