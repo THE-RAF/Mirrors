@@ -22,7 +22,7 @@ export class Mirror {
      */
     constructor({ 
         x1, y1, x2, y2, 
-        thickness = 3, 
+        thickness = 5, 
         reflectiveColor = '#888', 
         backColor = '#000', 
         parentSvg, 
@@ -37,9 +37,15 @@ export class Mirror {
         this.backColor = backColor;
         this.draggable = draggable;
 
+        // Internal configuration for 3-line mirror rendering
+        this.centerThicknessRatio = 0.55; // Center line is 55% of total thickness
+        this.reflectiveThicknessRatio = 0.45; // Each reflective line is 45% of total thickness
+        this.reflectiveOffsetRatio = 1; // Distance from center as ratio of total thickness
+
         // SVG elements
-        this.reflectiveLine = null;
-        this.backLine = null;
+        this.centerLine = null;
+        this.reflectiveLine1 = null;
+        this.reflectiveLine2 = null;
         this.group = null;
         
         // Drag state
@@ -73,53 +79,76 @@ export class Mirror {
     }
 
     /**
-     * Create both mirror lines (reflective and back) and add them to the group
+     * Create all three mirror lines (center + two reflective sides) and add them to the group
      */
     createMirrorLines() {
-        const { reflectiveOffset, backOffset } = this.calculateLineOffsets();
+        const { centerOffset, reflectiveOffset1, reflectiveOffset2 } = this.calculateLineOffsets();
         
-        this.backLine = this.createLine({ offset: backOffset, color: this.backColor });
-        this.reflectiveLine = this.createLine({ offset: reflectiveOffset, color: this.reflectiveColor });
+        // Create lines in back-to-front order for proper rendering
+        this.reflectiveLine1 = this.createLine({ 
+            offset: reflectiveOffset1, 
+            color: this.reflectiveColor, 
+            thickness: this.thickness * this.reflectiveThicknessRatio 
+        });
+        this.reflectiveLine2 = this.createLine({ 
+            offset: reflectiveOffset2, 
+            color: this.reflectiveColor, 
+            thickness: this.thickness * this.reflectiveThicknessRatio 
+        });
+        this.centerLine = this.createLine({ 
+            offset: centerOffset, 
+            color: this.backColor, 
+            thickness: this.thickness * this.centerThicknessRatio 
+        });
         
-        this.group.appendChild(this.backLine);
-        this.group.appendChild(this.reflectiveLine);
+        this.group.appendChild(this.reflectiveLine1);
+        this.group.appendChild(this.reflectiveLine2);
+        this.group.appendChild(this.centerLine);
     }
 
     /**
-     * Create a single mirror line with the given offset and color
+     * Create a single mirror line with the given offset, color, and thickness
      * @param {Object} config
      * @param {Object} config.offset - {x1, y1, x2, y2} coordinates for the line
      * @param {string} config.color - Line color
+     * @param {number} config.thickness - Line thickness
      * @returns {SVGLineElement} The created line element
      */
-    createLine({ offset, color }) {
+    createLine({ offset, color, thickness }) {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', offset.x1);
         line.setAttribute('y1', offset.y1);
         line.setAttribute('x2', offset.x2);
         line.setAttribute('y2', offset.y2);
         line.setAttribute('stroke', color);
-        line.setAttribute('stroke-width', this.thickness);
+        line.setAttribute('stroke-width', thickness);
         return line;
     }
 
     /**
-     * Calculate line offsets for both reflective and back lines
-     * @returns {Object} {reflectiveOffset, backOffset} with x1,y1,x2,y2 for each line
+     * Calculate line offsets for center and both reflective lines
+     * @returns {Object} {centerOffset, reflectiveOffset1, reflectiveOffset2} with x1,y1,x2,y2 for each line
      */
     calculateLineOffsets() {
         const { offsetX, offsetY } = this.calculatePerpendicularOffset();
         
         return {
-            // Reflective side faces the right of the line
-            reflectiveOffset: {
+            // Center line (black, thicker)
+            centerOffset: {
+                x1: this.x1,
+                y1: this.y1,
+                x2: this.x2,
+                y2: this.y2
+            },
+            // First reflective side (gray, thinner)
+            reflectiveOffset1: {
                 x1: this.x1 - offsetX,
                 y1: this.y1 - offsetY,
                 x2: this.x2 - offsetX,
                 y2: this.y2 - offsetY
             },
-            // Back side faces the left of the line
-            backOffset: {
+            // Second reflective side (gray, thinner)
+            reflectiveOffset2: {
                 x1: this.x1 + offsetX,
                 y1: this.y1 + offsetY,
                 x2: this.x2 + offsetX,
@@ -143,10 +172,10 @@ export class Mirror {
         const rightX = dy / length;
         const rightY = -dx / length;
         
-        // Apply half thickness to offset from center axis
+        // Apply offset distance from center axis
         return {
-            offsetX: rightX * (this.thickness / 2),
-            offsetY: rightY * (this.thickness / 2)
+            offsetX: rightX * (this.thickness * this.reflectiveOffsetRatio / 2),
+            offsetY: rightY * (this.thickness * this.reflectiveOffsetRatio / 2)
         };
     }
 
@@ -192,15 +221,16 @@ export class Mirror {
     }
 
     /**
-     * Update both mirror lines with current coordinates
+     * Update all three mirror lines with current coordinates
      */
     updateLines() {
-        if (!this.backLine || !this.reflectiveLine) return;
+        if (!this.centerLine || !this.reflectiveLine1 || !this.reflectiveLine2) return;
 
-        const { reflectiveOffset, backOffset } = this.calculateLineOffsets();
+        const { centerOffset, reflectiveOffset1, reflectiveOffset2 } = this.calculateLineOffsets();
 
-        this.updateLinePosition({ line: this.backLine, offset: backOffset });
-        this.updateLinePosition({ line: this.reflectiveLine, offset: reflectiveOffset });
+        this.updateLinePosition({ line: this.centerLine, offset: centerOffset });
+        this.updateLinePosition({ line: this.reflectiveLine1, offset: reflectiveOffset1 });
+        this.updateLinePosition({ line: this.reflectiveLine2, offset: reflectiveOffset2 });
     }
 
     /**
@@ -223,8 +253,9 @@ export class Mirror {
         if (this.group && this.group.parentNode) {
             this.group.parentNode.removeChild(this.group);
         }
-        this.reflectiveLine = null;
-        this.backLine = null;
+        this.centerLine = null;
+        this.reflectiveLine1 = null;
+        this.reflectiveLine2 = null;
         this.group = null;
     }
 }
