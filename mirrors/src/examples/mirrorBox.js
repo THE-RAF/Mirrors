@@ -61,6 +61,9 @@ export const mirrorBoxExample = {
             draggableMirrors: true,
             draggableViewers: true
         },
+        reflections: {
+            enabled: true
+        },
         lightBeamProjector: {
             enabled: true,
             config: {

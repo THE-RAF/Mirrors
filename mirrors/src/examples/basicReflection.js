@@ -63,6 +63,9 @@ export const basicReflectionExample = {
             draggableMirrors: false,
             draggableViewers: true
         },
+        reflections: {
+            enabled: true
+        },
         lightBeamProjector: {
             enabled: true,
             config: {

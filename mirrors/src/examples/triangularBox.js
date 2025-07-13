@@ -72,6 +72,9 @@ export const triangularBoxExample = {
             draggableMirrors: true,
             draggableViewers: true
         },
+        reflections: {
+            enabled: false
+        },
         lightBeamProjector: {
             enabled: true,
             config: {

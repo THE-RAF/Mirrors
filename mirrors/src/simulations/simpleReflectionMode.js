@@ -103,14 +103,16 @@ export class SimpleReflectionMode {
     }
 
     /**
-     * Initialize reflection system
+     * Initialize reflection system (if enabled in config)
      */
     initializeReflections() {
-        this.reflectionEngine.createReflections({ 
-            polygons: this.polygons, 
-            viewers: this.viewers, 
-            mirrors: this.mirrors 
-        });
+        if (this.modeConfig.reflections?.enabled !== false) {
+            this.reflectionEngine.createReflections({ 
+                polygons: this.polygons, 
+                viewers: this.viewers, 
+                mirrors: this.mirrors 
+            });
+        }
     }
 
     /**
