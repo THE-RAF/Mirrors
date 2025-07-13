@@ -3,3 +3,4 @@
 - make recursive reflections (virtual mirrors)
 - rename geometry.js to geometryFactory.js
 - put toggle for LightBeamProjector in the config file
+- remove unused event system in LightBeamProjector
