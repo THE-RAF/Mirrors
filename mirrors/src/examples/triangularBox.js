@@ -73,7 +73,13 @@ export const triangularBoxExample = {
             draggableViewers: true
         },
         reflections: {
-            enabled: false
+            enabled: true
+        },
+        infiniteReflections: { // Experimental feature, may cause performance issues or unexpected behavior
+            enabled: true,
+            maxDepth: 3,
+            fadeRate: 0.7,
+            minOpacity: 0.1
         },
         lightBeamProjector: {
             enabled: true,

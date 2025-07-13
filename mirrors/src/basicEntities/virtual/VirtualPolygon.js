@@ -22,6 +22,7 @@ export class VirtualPolygon extends Polygon {
      * @param {Function} [config.onVirtualClick] - Callback function when virtual polygon is clicked
      * @param {Object} [config.sourcePolygon] - Reference to the real polygon this virtual polygon reflects
      * @param {Object} [config.sourceMirror] - Reference to the mirror that creates this reflection
+     * @param {number} [config.opacity=0.5] - Opacity level for the virtual polygon
      */
     constructor({ 
         vertices, 
@@ -33,7 +34,8 @@ export class VirtualPolygon extends Polygon {
         clickable = false,
         onVirtualClick = null,
         sourcePolygon = null,
-        sourceMirror = null
+        sourceMirror = null,
+        opacity = 0.5
     }) {
         super({
             vertices,
@@ -50,6 +52,7 @@ export class VirtualPolygon extends Polygon {
         // Store source references for tracking the origin of this reflection
         this.sourcePolygon = sourcePolygon;
         this.sourceMirror = sourceMirror;
+        this.opacity = opacity;
         
         this.applyVirtualStyling();
         
@@ -67,8 +70,8 @@ export class VirtualPolygon extends Polygon {
         // Add dashed stroke
         this.element.setAttribute('stroke-dasharray', '8,4');
         
-        // Reduce opacity for virtual appearance
-        this.element.setAttribute('opacity', '0.5');
+        // Set custom opacity
+        this.element.setAttribute('opacity', this.opacity.toString());
         
         // Add visual feedback for clickable virtual polygons
         if (this.clickable) {

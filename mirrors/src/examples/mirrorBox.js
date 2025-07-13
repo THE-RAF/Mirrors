@@ -64,6 +64,12 @@ export const mirrorBoxExample = {
         reflections: {
             enabled: true
         },
+        infiniteReflections: { // Experimental feature, may cause performance issues or unexpected behavior
+            enabled: false,
+            maxDepth: 3,
+            fadeRate: 0.7,
+            minOpacity: 0.1
+        },
         lightBeamProjector: {
             enabled: true,
             config: {

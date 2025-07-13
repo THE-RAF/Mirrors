@@ -1,6 +1,7 @@
 Perhaps do differently:
 - total separation of concerns between graphics, data and functionality
-
+- use functional programming and state management instead of OOP (state machines?)
+- create standalone isolated smaller apps for different concepts (like single-order reflections, infinite reflections, orthogonal reflections, etc.)
 
 I learned:
 - LLM created md files help a lot, perhaps I can create a new architecture to keep them on the codebase

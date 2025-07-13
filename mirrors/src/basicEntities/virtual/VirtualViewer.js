@@ -22,6 +22,7 @@ export class VirtualViewer extends Viewer {
      * @param {boolean} [config.draggable=false] - Whether the viewer can be dragged
      * @param {Object} [config.sourceViewer] - Reference to the real viewer this virtual viewer reflects
      * @param {Object} [config.sourceMirror] - Reference to the mirror that creates this reflection
+     * @param {number} [config.opacity=0.5] - Opacity level for the virtual viewer
      */
     constructor({ 
         x, 
@@ -33,7 +34,8 @@ export class VirtualViewer extends Viewer {
         parentSvg, 
         draggable = false,
         sourceViewer = null,
-        sourceMirror = null
+        sourceMirror = null,
+        opacity = 0.5
     }) {
         super({
             x,
@@ -49,6 +51,7 @@ export class VirtualViewer extends Viewer {
         // Store source references for tracking the origin of this reflection
         this.sourceViewer = sourceViewer;
         this.sourceMirror = sourceMirror;
+        this.opacity = opacity;
         
         this.applyVirtualStyling();
     }
@@ -62,7 +65,7 @@ export class VirtualViewer extends Viewer {
         // Add dashed stroke
         this.element.setAttribute('stroke-dasharray', '8,4');
         
-        // Reduce opacity for virtual appearance
-        this.element.setAttribute('opacity', '0.5');
+        // Set custom opacity
+        this.element.setAttribute('opacity', this.opacity.toString());
     }
 }

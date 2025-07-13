@@ -6,6 +6,7 @@ import { basicReflectionExample } from './examples/basicReflection.js';
 import { diagonalReflectionExample } from './examples/diagonalReflection.js';
 import { mirrorBoxExample } from './examples/mirrorBox.js';
 import { triangularBoxExample } from './examples/triangularBox.js';
+import { infiniteBoxExample } from './examples/infiniteBox.js';
 
 // Collection of all available examples
 export const examples = {
@@ -13,6 +14,7 @@ export const examples = {
     'diagonal-reflection': diagonalReflectionExample,
     'mirror-box': mirrorBoxExample,
     'triangular-box': triangularBoxExample,
+    'infinite-box': infiniteBoxExample,
 };
 
 /**
