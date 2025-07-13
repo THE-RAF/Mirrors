@@ -9,6 +9,6 @@ export const generalConfig = {
     },
     
     // Example selection - change this to load different examples
-    // Available options: 'basic-reflection', 'diagonal-reflection', 'mirror-box'
-    currentExample: 'mirror-box'
+    // Available options: 'basic-reflection', 'diagonal-reflection', 'mirror-box', 'triangular-box'
+    currentExample: 'triangular-box'
 };
