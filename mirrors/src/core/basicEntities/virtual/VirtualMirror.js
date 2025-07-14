@@ -27,7 +27,7 @@ export class VirtualMirror extends Mirror {
      */
     constructor({ 
         x1, y1, x2, y2, 
-        thickness = 5, 
+        thickness = 3, 
         reflectiveColor = '#999', 
         centerColor = '#666', 
         parentSvg, 

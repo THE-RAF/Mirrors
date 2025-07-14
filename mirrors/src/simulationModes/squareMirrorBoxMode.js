@@ -4,6 +4,7 @@
  */
 
 import { MirrorBox } from '../core/composedEntities/real/MirrorBox.js';
+import { VirtualMirrorBox } from '../core/composedEntities/virtual/VirtualMirrorBox.js';
 
 /**
  * @class SquareMirrorBoxMode
@@ -36,7 +37,7 @@ export class SquareMirrorBoxMode {
      */
     init() {
         this.createRealBox();
-        // TODO: Implement tiling system
+        this.createTestVirtualBox();
         console.log('Square mirror box simulation started');
     }
 
@@ -61,6 +62,28 @@ export class SquareMirrorBoxMode {
     }
 
     /**
+     * Create a test virtual mirror box (simple demonstration)
+     */
+    createTestVirtualBox() {
+        const { center, boxWidth, boxHeight } = this.boxConfig;
+        
+        // Create a virtual box slightly offset from the real one for testing
+        const virtualBox = new VirtualMirrorBox({
+            x: center.x + boxWidth + 50,  // Offset to the right
+            y: center.y,
+            boxWidth: boxWidth,
+            boxHeight: boxHeight,
+            parentSvg: this.svgCanvas,
+            polygons: this.polygonConfigs,  // Same polygons as real box
+            viewers: this.viewerConfigs,    // Same viewers as real box
+            sourceMirrorBox: this.realBox, // Reference to source
+            opacity: 0.4                   // Slightly more visible for demo
+        });
+        
+        this.virtualBoxes.push(virtualBox);
+    }
+
+    /**
      * Update simulation (placeholder)
      */
     update() {
@@ -76,6 +99,8 @@ export class SquareMirrorBoxMode {
             this.realBox = null;
         }
         
-        // TODO: Clean up virtual boxes
+        // Clean up virtual boxes
+        this.virtualBoxes.forEach(virtualBox => virtualBox.destroy());
+        this.virtualBoxes = [];
     }
 }
