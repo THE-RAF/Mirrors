@@ -5,6 +5,8 @@
 
 import { MirrorBox } from '../core/composedEntities/real/MirrorBox.js';
 import { VirtualMirrorBox } from '../core/composedEntities/virtual/VirtualMirrorBox.js';
+import { BoxReflectionEngine } from '../core/engines/boxReflectionEngine/boxReflectionEngine.js';
+import { BoxReflectionTiling } from '../core/engines/boxReflectionEngine/BoxReflectionTiling.js';
 
 /**
  * @class SquareMirrorBoxMode
@@ -28,7 +30,19 @@ export class SquareMirrorBoxMode {
         // Real mirror box (contains mirrors, polygons, and viewers)
         this.realBox = null;
         
-        // Virtual tiled boxes (will be implemented later)
+        // Box reflection tiling engine for creating infinite mirror effects
+        this.boxTiling = new BoxReflectionTiling({
+            svgCanvas: this.svgCanvas,
+            canvasWidth: 800,  // TODO: Get from config
+            canvasHeight: 800  // TODO: Get from config
+        });
+        
+        // Keep the individual reflection engine for compatibility (may remove later)
+        this.boxReflectionEngine = new BoxReflectionEngine({
+            svgCanvas: this.svgCanvas
+        });
+        
+        // Virtual tiled boxes (managed by tiling engine)
         this.virtualBoxes = [];
     }
 
@@ -37,7 +51,8 @@ export class SquareMirrorBoxMode {
      */
     init() {
         this.createRealBox();
-        this.createTestVirtualBox();
+        this.createTiling();
+        this.setupUpdateSystem();
         console.log('Square mirror box simulation started');
     }
 
@@ -63,33 +78,66 @@ export class SquareMirrorBoxMode {
     }
 
     /**
-     * Create a test virtual mirror box (simple demonstration)
+     * Create tiling pattern using BoxReflectionTiling engine
      */
-    createTestVirtualBox() {
-        const { center, boxWidth, boxHeight, mirrorThickness } = this.boxConfig;
-        
-        // Create a virtual box slightly offset from the real one for testing
-        const virtualBox = new VirtualMirrorBox({
-            x: center.x + boxWidth + 50,  // Offset to the right
-            y: center.y,
-            boxWidth: boxWidth,
-            boxHeight: boxHeight,
-            thickness: mirrorThickness,     // Same thickness as real box
-            parentSvg: this.svgCanvas,
-            polygons: this.polygonConfigs,  // Same polygons as real box
-            viewers: this.viewerConfigs,    // Same viewers as real box
-            sourceMirrorBox: this.realBox, // Reference to source
-            opacity: 0.4                   // Slightly more visible for demo
+    createTiling() {
+        this.boxTiling.createTiling({
+            sourceBox: this.realBox,
+            opacity: 0.4  // Slightly more visible for testing
         });
         
-        this.virtualBoxes.push(virtualBox);
+        // Get virtual boxes from tiling engine for update system compatibility
+        this.virtualBoxes = this.boxTiling.getVirtualBoxes();
+        
+        console.log('Created box tiling pattern');
     }
 
     /**
-     * Update simulation (placeholder)
+     * Setup the update system for real-time reflection updates
+     */
+    setupUpdateSystem() {
+        let updateScheduled = false;
+        
+        document.addEventListener('mousemove', () => {
+            // Check if any real scene element is being dragged
+            if (this.isSceneBeingDragged() && !updateScheduled) {
+                updateScheduled = true;
+                
+                // Use requestAnimationFrame to throttle updates to ~60fps max
+                requestAnimationFrame(() => {
+                    this.update();
+                    updateScheduled = false;
+                });
+            }
+        });
+    }
+
+    /**
+     * Check if any element in the real scene is being dragged
+     * @returns {boolean} True if any polygon, mirror, or viewer is being dragged
+     */
+    isSceneBeingDragged() {
+        if (!this.realBox) return false;
+        
+        const polygons = this.realBox.getPolygons();
+        const viewers = this.realBox.getViewers();
+        const mirrors = this.realBox.getMirrors();
+        
+        const entityGroups = [polygons, viewers, mirrors];
+        return entityGroups.some(group => 
+            group.some(entity => entity.isDragging)
+        );
+    }
+
+    /**
+     * Update simulation - synchronize virtual boxes with real box changes
      */
     update() {
-        // TODO: Update virtual boxes when real objects move
+        // Update the tiling pattern when real objects move
+        this.boxTiling.updateTiling({ sourceBox: this.realBox });
+        
+        // Update local reference for compatibility
+        this.virtualBoxes = this.boxTiling.getVirtualBoxes();
     }
 
     /**
@@ -101,8 +149,18 @@ export class SquareMirrorBoxMode {
             this.realBox = null;
         }
         
-        // Clean up virtual boxes
-        this.virtualBoxes.forEach(virtualBox => virtualBox.destroy());
+        // Clean up tiling engine
+        if (this.boxTiling) {
+            this.boxTiling.destroy();
+            this.boxTiling = null;
+        }
+        
+        // Clean up individual box reflection engine
+        if (this.boxReflectionEngine) {
+            this.boxReflectionEngine.destroy();
+            this.boxReflectionEngine = null;
+        }
+        
         this.virtualBoxes = [];
     }
 }

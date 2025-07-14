@@ -31,8 +31,8 @@ export const tiledSquareMirrorBox = {
     // Box configuration for rectangular mirror box
     boxConfig: {
         center: { x: 400, y: 400 },  // Configurable center position
-        boxWidth: 200,               // Width of the rectangular box
-        boxHeight: 200,              // Height of the rectangular box
+        boxWidth: 100,               // Width of the rectangular box
+        boxHeight: 100,              // Height of the rectangular box
         mirrorThickness: 3           // Thickness of the mirror walls
     }
 };
