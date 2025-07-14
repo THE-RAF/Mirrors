@@ -3,7 +3,7 @@
  * Uses symmetry-based tiling instead of ray-tracing for infinite mirror effects
  */
 
-import { Polygon } from '../core/basicEntities/real/Polygon.js';
+import { MirrorBox } from '../core/composedEntities/real/MirrorBox.js';
 
 /**
  * @class SquareMirrorBoxMode
@@ -18,25 +18,44 @@ export class SquareMirrorBoxMode {
      * @param {SVGElement} config.svgCanvas - SVG element for rendering
      */
     constructor({ sceneEntities, modeConfig, svgCanvas }) {
-        this.objectConfigs = sceneEntities.objects || [];
+        this.polygonConfigs = sceneEntities.objects || [];
+        this.viewerConfigs = sceneEntities.viewers || [];
         this.boxConfig = sceneEntities.boxConfig;
         this.modeConfig = modeConfig;
         this.svgCanvas = svgCanvas;
+
+        // Real mirror box (contains mirrors, polygons, and viewers)
+        this.realBox = null;
+        
+        // Virtual tiled boxes (will be implemented later)
+        this.virtualBoxes = [];
     }
 
     /**
      * Initialize the simulation
      */
     init() {
-        const testPolygon = new Polygon({
-            vertices: [
-                { x: 50, y: 50 },
-                { x: 100, y: 50 },
-                { x: 75, y: 100 }
-            ],
-            fill: 'blue',
+        this.createRealBox();
+        // TODO: Implement tiling system
+        console.log('Square mirror box simulation started');
+    }
+
+    /**
+     * Create the central mirror box with internal polygons and viewers
+     */
+    createRealBox() {
+        const { center, size } = this.boxConfig;
+        
+        this.realBox = new MirrorBox({
+            x: center.x,
+            y: center.y,
+            size: size,
             parentSvg: this.svgCanvas,
-            isDraggable: true
+            polygons: this.polygonConfigs,
+            viewers: this.viewerConfigs,
+            isDraggable: this.modeConfig.interaction.draggableMirrors,
+            polygonsDraggable: this.modeConfig.interaction.draggableObjects,
+            viewersDraggable: this.modeConfig.interaction.draggableViewers
         });
     }
 
@@ -51,8 +70,11 @@ export class SquareMirrorBoxMode {
      * Clean up resources
      */
     destroy() {
-        this.realObjects.forEach(obj => obj.destroy());
-        this.realObjects = [];
+        if (this.realBox) {
+            this.realBox.destroy();
+            this.realBox = null;
+        }
+        
         // TODO: Clean up virtual boxes
     }
 }

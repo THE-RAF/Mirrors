@@ -67,9 +67,9 @@ export const modeConfigs = {
 
     'squareMirrorBox': {
         interaction: {
-            draggableObjects: true,  // Only objects inside the central box
+            draggableObjects: true,  // Objects inside the central box
             draggableMirrors: false, // Box structure is fixed
-            draggableViewers: false  // No viewers in this mode
+            draggableViewers: true   // Viewers inside the box
         },
         tiling: {
             enabled: true,
