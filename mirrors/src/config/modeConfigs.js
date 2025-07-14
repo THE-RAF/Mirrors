@@ -71,11 +71,6 @@ export const modeConfigs = {
             draggableMirrors: false, // Box structure is fixed
             draggableViewers: true   // Viewers inside the box
         },
-        tiling: {
-            enabled: true,
-            boxSize: 200,           // Square box dimensions in pixels
-            tilesPerDirection: 4    // Create 4x4 grid of tiled boxes
-        },
         lightBeamProjector: {
             enabled: false          // Simplified mode without light beams
         }

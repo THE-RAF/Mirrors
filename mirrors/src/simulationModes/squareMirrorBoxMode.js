@@ -44,12 +44,13 @@ export class SquareMirrorBoxMode {
      * Create the central mirror box with internal polygons and viewers
      */
     createRealBox() {
-        const { center, size } = this.boxConfig;
+        const { center, boxWidth, boxHeight } = this.boxConfig;
         
         this.realBox = new MirrorBox({
             x: center.x,
             y: center.y,
-            size: size,
+            boxWidth: boxWidth,
+            boxHeight: boxHeight,
             parentSvg: this.svgCanvas,
             polygons: this.polygonConfigs,
             viewers: this.viewerConfigs,

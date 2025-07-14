@@ -10,7 +10,7 @@ import { Viewer } from '../../basicEntities/real/Viewer.js';
 
 /**
  * @class MirrorBox
- * Composed entity that creates a square box made of 4 mirrors with internal polygons and viewers
+ * Composed entity that creates a rectangular box made of 4 mirrors with internal polygons and viewers
  * Handles creation, positioning, and management of all mirror, polygon, and viewer components
  */
 export class MirrorBox {
@@ -18,7 +18,8 @@ export class MirrorBox {
      * @param {Object} config
      * @param {number} config.x - Center X coordinate of the box
      * @param {number} config.y - Center Y coordinate of the box
-     * @param {number} config.size - Side length of the square box
+     * @param {number} config.boxWidth - Width of the rectangular box
+     * @param {number} config.boxHeight - Height of the rectangular box
      * @param {SVGElement} config.parentSvg - SVG element for rendering mirrors
      * @param {Array} [config.polygons] - Array of polygon configurations to create inside the box
      * @param {Array} [config.viewers] - Array of viewer configurations to create inside the box
@@ -27,13 +28,14 @@ export class MirrorBox {
      * @param {boolean} [config.viewersDraggable=true] - Whether viewers inside can be dragged
      */
     constructor({ 
-        x, y, size, parentSvg, 
+        x, y, boxWidth, boxHeight, parentSvg, 
         polygons = [], viewers = [], 
         isDraggable = false, polygonsDraggable = true, viewersDraggable = true 
     }) {
         this.centerX = x;
         this.centerY = y;
-        this.size = size;
+        this.boxWidth = boxWidth;
+        this.boxHeight = boxHeight;
         this.parentSvg = parentSvg;
         this.isDraggable = isDraggable;
         this.polygonsDraggable = polygonsDraggable;
@@ -48,47 +50,48 @@ export class MirrorBox {
     }
 
     /**
-     * Create the 4 mirrors that form the square box
+     * Create the 4 mirrors that form the rectangular box
      */
     createMirrors() {
-        const halfSize = this.size / 2;
+        const halfWidth = this.boxWidth / 2;
+        const halfHeight = this.boxHeight / 2;
 
         // Top mirror (horizontal)
         const topMirror = new Mirror({
-            x1: this.centerX - halfSize,
-            y1: this.centerY - halfSize,
-            x2: this.centerX + halfSize,
-            y2: this.centerY - halfSize,
+            x1: this.centerX - halfWidth,
+            y1: this.centerY - halfHeight,
+            x2: this.centerX + halfWidth,
+            y2: this.centerY - halfHeight,
             parentSvg: this.parentSvg,
             isDraggable: this.isDraggable
         });
 
         // Right mirror (vertical)
         const rightMirror = new Mirror({
-            x1: this.centerX + halfSize,
-            y1: this.centerY - halfSize,
-            x2: this.centerX + halfSize,
-            y2: this.centerY + halfSize,
+            x1: this.centerX + halfWidth,
+            y1: this.centerY - halfHeight,
+            x2: this.centerX + halfWidth,
+            y2: this.centerY + halfHeight,
             parentSvg: this.parentSvg,
             isDraggable: this.isDraggable
         });
 
         // Bottom mirror (horizontal)
         const bottomMirror = new Mirror({
-            x1: this.centerX + halfSize,
-            y1: this.centerY + halfSize,
-            x2: this.centerX - halfSize,
-            y2: this.centerY + halfSize,
+            x1: this.centerX + halfWidth,
+            y1: this.centerY + halfHeight,
+            x2: this.centerX - halfWidth,
+            y2: this.centerY + halfHeight,
             parentSvg: this.parentSvg,
             isDraggable: this.isDraggable
         });
 
         // Left mirror (vertical)
         const leftMirror = new Mirror({
-            x1: this.centerX - halfSize,
-            y1: this.centerY + halfSize,
-            x2: this.centerX - halfSize,
-            y2: this.centerY - halfSize,
+            x1: this.centerX - halfWidth,
+            y1: this.centerY + halfHeight,
+            x2: this.centerX - halfWidth,
+            y2: this.centerY - halfHeight,
             parentSvg: this.parentSvg,
             isDraggable: this.isDraggable
         });
@@ -159,15 +162,19 @@ export class MirrorBox {
      * @param {Object} config
      * @param {number} config.x - New center X coordinate
      * @param {number} config.y - New center Y coordinate
-     * @param {number} [config.size] - New size (optional)
+     * @param {number} [config.boxWidth] - New width (optional)
+     * @param {number} [config.boxHeight] - New height (optional)
      * @param {Array} [config.polygons] - New polygons configuration (optional)
      * @param {Array} [config.viewers] - New viewers configuration (optional)
      */
-    update({ x, y, size, polygons, viewers }) {
+    update({ x, y, boxWidth, boxHeight, polygons, viewers }) {
         this.centerX = x;
         this.centerY = y;
-        if (size !== undefined) {
-            this.size = size;
+        if (boxWidth !== undefined) {
+            this.boxWidth = boxWidth;
+        }
+        if (boxHeight !== undefined) {
+            this.boxHeight = boxHeight;
         }
 
         // Destroy old mirrors, polygons, and viewers, create new ones
