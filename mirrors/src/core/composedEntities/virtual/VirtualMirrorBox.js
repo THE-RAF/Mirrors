@@ -19,6 +19,7 @@ export class VirtualMirrorBox {
      * @param {number} config.y - Center Y coordinate of the virtual box
      * @param {number} config.boxWidth - Width of the rectangular virtual box
      * @param {number} config.boxHeight - Height of the rectangular virtual box
+     * @param {number} [config.thickness=3] - Thickness of the virtual mirror walls
      * @param {SVGElement} config.parentSvg - SVG element for rendering virtual mirrors
      * @param {Array} [config.polygons] - Array of polygon configurations to create inside the virtual box
      * @param {Array} [config.viewers] - Array of viewer configurations to create inside the virtual box
@@ -30,12 +31,13 @@ export class VirtualMirrorBox {
         x, y, boxWidth, boxHeight, parentSvg, 
         polygons = [], viewers = [],
         sourceMirrorBox = null, reflectionMirror = null,
-        opacity = 0.3
+        opacity = 0.3, thickness = 3
     }) {
         this.centerX = x;
         this.centerY = y;
         this.boxWidth = boxWidth;
         this.boxHeight = boxHeight;
+        this.thickness = thickness;
         this.parentSvg = parentSvg;
         this.sourceMirrorBox = sourceMirrorBox;
         this.reflectionMirror = reflectionMirror;
@@ -63,6 +65,7 @@ export class VirtualMirrorBox {
             y1: this.centerY - halfHeight,
             x2: this.centerX + halfWidth,
             y2: this.centerY - halfHeight,
+            thickness: this.thickness,
             parentSvg: this.parentSvg,
             sourceMirror: this.sourceMirrorBox?.getMirrors()[0],
             reflectionMirror: this.reflectionMirror,
@@ -75,6 +78,7 @@ export class VirtualMirrorBox {
             y1: this.centerY - halfHeight,
             x2: this.centerX + halfWidth,
             y2: this.centerY + halfHeight,
+            thickness: this.thickness,
             parentSvg: this.parentSvg,
             sourceMirror: this.sourceMirrorBox?.getMirrors()[1],
             reflectionMirror: this.reflectionMirror,
@@ -87,6 +91,7 @@ export class VirtualMirrorBox {
             y1: this.centerY + halfHeight,
             x2: this.centerX - halfWidth,
             y2: this.centerY + halfHeight,
+            thickness: this.thickness,
             parentSvg: this.parentSvg,
             sourceMirror: this.sourceMirrorBox?.getMirrors()[2],
             reflectionMirror: this.reflectionMirror,
@@ -99,6 +104,7 @@ export class VirtualMirrorBox {
             y1: this.centerY + halfHeight,
             x2: this.centerX - halfWidth,
             y2: this.centerY - halfHeight,
+            thickness: this.thickness,
             parentSvg: this.parentSvg,
             sourceMirror: this.sourceMirrorBox?.getMirrors()[3],
             reflectionMirror: this.reflectionMirror,

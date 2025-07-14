@@ -20,6 +20,7 @@ export class MirrorBox {
      * @param {number} config.y - Center Y coordinate of the box
      * @param {number} config.boxWidth - Width of the rectangular box
      * @param {number} config.boxHeight - Height of the rectangular box
+     * @param {number} [config.thickness=3] - Thickness of the mirror walls
      * @param {SVGElement} config.parentSvg - SVG element for rendering mirrors
      * @param {Array} [config.polygons] - Array of polygon configurations to create inside the box
      * @param {Array} [config.viewers] - Array of viewer configurations to create inside the box
@@ -29,12 +30,14 @@ export class MirrorBox {
     constructor({ 
         x, y, boxWidth, boxHeight, parentSvg, 
         polygons = [], viewers = [],
-        polygonsDraggable = true, viewersDraggable = true 
+        polygonsDraggable = true, viewersDraggable = true,
+        thickness = 3
     }) {
         this.centerX = x;
         this.centerY = y;
         this.boxWidth = boxWidth;
         this.boxHeight = boxHeight;
+        this.thickness = thickness;
         this.parentSvg = parentSvg;
         this.polygonsDraggable = polygonsDraggable;
         this.viewersDraggable = viewersDraggable;
@@ -60,6 +63,7 @@ export class MirrorBox {
             y1: this.centerY - halfHeight,
             x2: this.centerX + halfWidth,
             y2: this.centerY - halfHeight,
+            thickness: this.thickness,
             parentSvg: this.parentSvg,
             draggable: false
         });
@@ -70,6 +74,7 @@ export class MirrorBox {
             y1: this.centerY - halfHeight,
             x2: this.centerX + halfWidth,
             y2: this.centerY + halfHeight,
+            thickness: this.thickness,
             parentSvg: this.parentSvg,
             draggable: false
         });
@@ -80,6 +85,7 @@ export class MirrorBox {
             y1: this.centerY + halfHeight,
             x2: this.centerX - halfWidth,
             y2: this.centerY + halfHeight,
+            thickness: this.thickness,
             parentSvg: this.parentSvg,
             draggable: false
         });
@@ -90,6 +96,7 @@ export class MirrorBox {
             y1: this.centerY + halfHeight,
             x2: this.centerX - halfWidth,
             y2: this.centerY - halfHeight,
+            thickness: this.thickness,
             parentSvg: this.parentSvg,
             draggable: false
         });

@@ -45,13 +45,14 @@ export class SquareMirrorBoxMode {
      * Create the central mirror box with internal polygons and viewers
      */
     createRealBox() {
-        const { center, boxWidth, boxHeight } = this.boxConfig;
+        const { center, boxWidth, boxHeight, mirrorThickness } = this.boxConfig;
         
         this.realBox = new MirrorBox({
             x: center.x,
             y: center.y,
             boxWidth: boxWidth,
             boxHeight: boxHeight,
+            thickness: mirrorThickness,
             parentSvg: this.svgCanvas,
             polygons: this.polygonConfigs,
             viewers: this.viewerConfigs,
@@ -65,7 +66,7 @@ export class SquareMirrorBoxMode {
      * Create a test virtual mirror box (simple demonstration)
      */
     createTestVirtualBox() {
-        const { center, boxWidth, boxHeight } = this.boxConfig;
+        const { center, boxWidth, boxHeight, mirrorThickness } = this.boxConfig;
         
         // Create a virtual box slightly offset from the real one for testing
         const virtualBox = new VirtualMirrorBox({
@@ -73,6 +74,7 @@ export class SquareMirrorBoxMode {
             y: center.y,
             boxWidth: boxWidth,
             boxHeight: boxHeight,
+            thickness: mirrorThickness,     // Same thickness as real box
             parentSvg: this.svgCanvas,
             polygons: this.polygonConfigs,  // Same polygons as real box
             viewers: this.viewerConfigs,    // Same viewers as real box
