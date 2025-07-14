@@ -5,11 +5,12 @@
 
 import { VirtualPolygon } from '../../basicEntities/virtual/VirtualPolygon.js';
 import { VirtualViewer } from '../../basicEntities/virtual/VirtualViewer.js';
+import { VirtualMirror } from '../../basicEntities/virtual/VirtualMirror.js';
 import { reflectPolygonOverAxis } from '../../../math/analyticalGeometry.js';
 
 /**
  * @class VirtualObjectManager
- * Handles creation and updates of individual virtual polygons and viewers
+ * Handles creation and updates of individual virtual polygons, viewers, and mirrors
  */
 export class VirtualObjectManager {
     /**
@@ -101,6 +102,48 @@ export class VirtualObjectManager {
     }
 
     /**
+     * Create a single virtual mirror from a real mirror and reflection mirror
+     * @param {Object} config
+     * @param {Object} config.mirror - Real mirror object to reflect
+     * @param {Object} config.reflectionMirror - Mirror object to reflect across
+     * @returns {VirtualMirror} The created virtual mirror reflection
+     */
+    createVirtualMirror({ mirror, reflectionMirror }) {
+        // Define mirror axis from reflection mirror coordinates
+        const axis = {
+            x1: reflectionMirror.x1,
+            y1: reflectionMirror.y1,
+            x2: reflectionMirror.x2,
+            y2: reflectionMirror.y2
+        };
+        
+        // Reflect mirror endpoints using existing math function
+        const reflectedPoints = reflectPolygonOverAxis({
+            polygon: [
+                { x: mirror.x1, y: mirror.y1 },
+                { x: mirror.x2, y: mirror.y2 }
+            ],
+            axis: axis
+        });
+        
+        // Create virtual mirror for the reflection
+        const virtualMirror = new VirtualMirror({
+            x1: reflectedPoints[0].x,
+            y1: reflectedPoints[0].y,
+            x2: reflectedPoints[1].x,
+            y2: reflectedPoints[1].y,
+            thickness: mirror.thickness,
+            reflectiveColor: mirror.reflectiveColor,
+            centerColor: mirror.centerColor,
+            parentSvg: this.svgCanvas,
+            sourceMirror: mirror,
+            reflectionMirror: reflectionMirror
+        });
+        
+        return virtualMirror;
+    }
+
+    /**
      * Update a single virtual polygon based on current positions
      * @param {Object} config
      * @param {VirtualPolygon} config.virtualPolygon - Virtual polygon to update
@@ -161,6 +204,43 @@ export class VirtualObjectManager {
                 virtualViewer.element.setAttribute('cx', reflectedPoint.x);
                 virtualViewer.element.setAttribute('cy', reflectedPoint.y);
             }
+        }
+    }
+
+    /**
+     * Update a single virtual mirror based on current positions
+     * @param {Object} config
+     * @param {VirtualMirror} config.virtualMirror - Virtual mirror to update
+     */
+    updateVirtualMirror({ virtualMirror }) {
+        const sourceMirror = virtualMirror.sourceMirror;
+        const reflectionMirror = virtualMirror.reflectionMirror;
+        
+        if (sourceMirror && reflectionMirror) {
+            // Define mirror axis from reflection mirror coordinates
+            const axis = {
+                x1: reflectionMirror.x1,
+                y1: reflectionMirror.y1,
+                x2: reflectionMirror.x2,
+                y2: reflectionMirror.y2
+            };
+            
+            // Reflect mirror endpoints using existing math function
+            const reflectedPoints = reflectPolygonOverAxis({
+                polygon: [
+                    { x: sourceMirror.x1, y: sourceMirror.y1 },
+                    { x: sourceMirror.x2, y: sourceMirror.y2 }
+                ],
+                axis: axis
+            });
+            
+            // Update the virtual mirror's position
+            virtualMirror.updatePosition({
+                x1: reflectedPoints[0].x,
+                y1: reflectedPoints[0].y,
+                x2: reflectedPoints[1].x,
+                y2: reflectedPoints[1].y
+            });
         }
     }
 }

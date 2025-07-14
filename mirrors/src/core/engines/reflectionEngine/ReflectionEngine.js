@@ -19,6 +19,7 @@ export class ReflectionEngine {
     constructor({ svgCanvas, onVirtualPolygonClick = null, virtualPolygonsClickable = true }) {
         this.virtualPolygons = [];
         this.virtualViewers = [];
+        this.virtualMirrors = [];
         
         // Create manager for individual virtual objects
         this.objectManager = new VirtualObjectManager({
@@ -29,7 +30,7 @@ export class ReflectionEngine {
     }
 
     /**
-     * Create reflections of all polygons and viewers across all mirrors
+     * Create reflections of all polygons, viewers, and mirrors across all mirrors
      * @param {Object} config
      * @param {Array} config.polygons - Array of real polygon objects
      * @param {Array} [config.viewers] - Array of real viewer objects
@@ -51,6 +52,20 @@ export class ReflectionEngine {
                 this.virtualViewers.push(virtualViewer);
             });
         });
+
+        // Create virtual mirrors for each mirror-mirror combination
+        mirrors.forEach(mirror => {
+            mirrors.forEach(reflectionMirror => {
+                // Don't reflect a mirror on itself
+                if (mirror !== reflectionMirror) {
+                    const virtualMirror = this.objectManager.createVirtualMirror({ 
+                        mirror, 
+                        reflectionMirror 
+                    });
+                    this.virtualMirrors.push(virtualMirror);
+                }
+            });
+        });
     }
 
     /**
@@ -70,6 +85,11 @@ export class ReflectionEngine {
         this.virtualViewers.forEach(virtualViewer => {
             this.objectManager.updateVirtualViewer({ virtualViewer });
         });
+
+        // Update all virtual mirrors
+        this.virtualMirrors.forEach(virtualMirror => {
+            this.objectManager.updateVirtualMirror({ virtualMirror });
+        });
     }
 
     /**
@@ -78,8 +98,10 @@ export class ReflectionEngine {
     clearReflections() {
         this.virtualPolygons.forEach(virtualPolygon => virtualPolygon.destroy());
         this.virtualViewers.forEach(virtualViewer => virtualViewer.destroy());
+        this.virtualMirrors.forEach(virtualMirror => virtualMirror.destroy());
         this.virtualPolygons = [];
         this.virtualViewers = [];
+        this.virtualMirrors = [];
     }
 
     /**
