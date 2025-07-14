@@ -63,5 +63,21 @@ export const modeConfigs = {
                 }
             }
         }
+    },
+
+    'squareMirrorBox': {
+        interaction: {
+            draggableObjects: true,  // Only objects inside the central box
+            draggableMirrors: false, // Box structure is fixed
+            draggableViewers: false  // No viewers in this mode
+        },
+        tiling: {
+            enabled: true,
+            boxSize: 200,           // Square box dimensions in pixels
+            tilesPerDirection: 4    // Create 4x4 grid of tiled boxes
+        },
+        lightBeamProjector: {
+            enabled: false          // Simplified mode without light beams
+        }
     }
 };
