@@ -23,21 +23,19 @@ export class MirrorBox {
      * @param {SVGElement} config.parentSvg - SVG element for rendering mirrors
      * @param {Array} [config.polygons] - Array of polygon configurations to create inside the box
      * @param {Array} [config.viewers] - Array of viewer configurations to create inside the box
-     * @param {boolean} [config.isDraggable=false] - Whether the box mirrors can be dragged
      * @param {boolean} [config.polygonsDraggable=true] - Whether polygons inside can be dragged
      * @param {boolean} [config.viewersDraggable=true] - Whether viewers inside can be dragged
      */
     constructor({ 
         x, y, boxWidth, boxHeight, parentSvg, 
-        polygons = [], viewers = [], 
-        isDraggable = false, polygonsDraggable = true, viewersDraggable = true 
+        polygons = [], viewers = [],
+        polygonsDraggable = true, viewersDraggable = true 
     }) {
         this.centerX = x;
         this.centerY = y;
         this.boxWidth = boxWidth;
         this.boxHeight = boxHeight;
         this.parentSvg = parentSvg;
-        this.isDraggable = isDraggable;
         this.polygonsDraggable = polygonsDraggable;
         this.viewersDraggable = viewersDraggable;
 
@@ -63,7 +61,7 @@ export class MirrorBox {
             x2: this.centerX + halfWidth,
             y2: this.centerY - halfHeight,
             parentSvg: this.parentSvg,
-            isDraggable: this.isDraggable
+            draggable: false
         });
 
         // Right mirror (vertical)
@@ -73,7 +71,7 @@ export class MirrorBox {
             x2: this.centerX + halfWidth,
             y2: this.centerY + halfHeight,
             parentSvg: this.parentSvg,
-            isDraggable: this.isDraggable
+            draggable: false
         });
 
         // Bottom mirror (horizontal)
@@ -83,7 +81,7 @@ export class MirrorBox {
             x2: this.centerX - halfWidth,
             y2: this.centerY + halfHeight,
             parentSvg: this.parentSvg,
-            isDraggable: this.isDraggable
+            draggable: false
         });
 
         // Left mirror (vertical)
@@ -93,7 +91,7 @@ export class MirrorBox {
             x2: this.centerX - halfWidth,
             y2: this.centerY - halfHeight,
             parentSvg: this.parentSvg,
-            isDraggable: this.isDraggable
+            draggable: false
         });
 
         this.mirrors = [topMirror, rightMirror, bottomMirror, leftMirror];
@@ -109,7 +107,7 @@ export class MirrorBox {
                 vertices: config.vertices,
                 fill: config.fill,
                 parentSvg: this.parentSvg,
-                isDraggable: this.polygonsDraggable
+                draggable: this.polygonsDraggable
             });
             this.polygons.push(polygon);
         });
@@ -127,7 +125,7 @@ export class MirrorBox {
                 radius: config.radius,
                 fill: config.fill,
                 parentSvg: this.parentSvg,
-                isDraggable: this.viewersDraggable
+                draggable: this.viewersDraggable
             });
             this.viewers.push(viewer);
         });
