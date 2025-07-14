@@ -12,7 +12,7 @@ export const modeConfigs = {
         },
         reflections: {
             enabled: true,
-            recursiveReflectionDepth: 2
+            recursiveReflectionDepth: 3
         },
         lightBeamProjector: {
             enabled: true,

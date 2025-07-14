@@ -47,6 +47,8 @@ export class VirtualObjectManager {
             axis: axis
         });
         
+        const sourceRealPolygon = polygon.sourceRealPolygon || polygon; // Use original polygon if available
+
         // Create virtual polygon for the reflection
         const virtualPolygon = new VirtualPolygon({
             vertices: reflectedVertices,
@@ -57,6 +59,7 @@ export class VirtualObjectManager {
             clickable: this.virtualPolygonsClickable,
             onVirtualClick: this.onVirtualPolygonClick,
             sourcePolygon: polygon,
+            sourceRealPolygon: sourceRealPolygon,
             sourceMirror: mirror
         });
         

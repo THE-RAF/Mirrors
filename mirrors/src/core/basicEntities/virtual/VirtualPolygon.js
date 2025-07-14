@@ -34,6 +34,7 @@ export class VirtualPolygon extends Polygon {
         clickable = false,
         onVirtualClick = null,
         sourcePolygon = null,
+        sourceRealPolygon = null,
         sourceMirror = null,
         opacity = 0.5
     }) {
@@ -51,6 +52,7 @@ export class VirtualPolygon extends Polygon {
         
         // Store source references for tracking the origin of this reflection
         this.sourcePolygon = sourcePolygon;
+        this.sourceRealPolygon = sourceRealPolygon;
         this.sourceMirror = sourceMirror;
         this.opacity = opacity;
         

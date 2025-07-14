@@ -45,7 +45,7 @@ export function calculateRealProjectionPath({ virtualPolygon, viewer, lightBeamE
     if (!lightBeamEngine) return null;
     
     const virtualCenter = calculatePolygonCenter({ vertices: virtualPolygon.vertices });
-    const realCenter = calculatePolygonCenter({ vertices: virtualPolygon.sourcePolygon.vertices });
+    const realCenter = calculatePolygonCenter({ vertices: virtualPolygon.sourceRealPolygon.vertices });
     
     // Calculate reverse path (viewer to virtual polygon) to find reflection direction
     const reverseDirection = { 

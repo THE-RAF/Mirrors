@@ -140,7 +140,7 @@ export class InfiniteReflectionEngine {
                     parentSvg: this.svgCanvas,
                     clickable: this.virtualPolygonsClickable,
                     onVirtualClick: this.onVirtualPolygonClick,
-                    sourcePolygon: isReal ? sourcePolygon : sourcePolygon.sourcePolygon,
+                    sourceRealPolygon: isReal ? sourcePolygon : sourcePolygon.sourcePolygon,
                     sourceMirror: sourceMirror,
                     opacity: newOpacity
                 });
