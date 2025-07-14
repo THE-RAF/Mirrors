@@ -64,7 +64,8 @@ export class SimpleReflectionMode {
             onVirtualPolygonClick: ({ virtualPolygon, event }) => {
                 this.handleVirtualPolygonClick({ virtualPolygon });
             },
-            virtualPolygonsClickable: this.modeConfig.lightBeamProjector.enabled
+            virtualPolygonsClickable: this.modeConfig.lightBeamProjector.enabled,
+            recursiveReflectionDepth: this.modeConfig.reflections.recursiveReflectionDepth
         });
         
         this.lightBeamEngine = new LightBeamEngine({ svgCanvas: this.backgroundLayer });

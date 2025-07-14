@@ -11,7 +11,8 @@ export const modeConfigs = {
             draggableViewers: true
         },
         reflections: {
-            enabled: true
+            enabled: true,
+            recursiveReflectionDepth: 2
         },
         lightBeamProjector: {
             enabled: true,

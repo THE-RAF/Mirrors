@@ -8,6 +8,7 @@ import { VirtualObjectManager } from './VirtualObjectManager.js';
 /**
  * @class ReflectionEngine
  * Handles creation, updating, and management of virtual polygon and viewer reflections
+ * with configurable recursive reflection depth for infinite mirror effects
  */
 export class ReflectionEngine {
     /**
@@ -15,11 +16,18 @@ export class ReflectionEngine {
      * @param {SVGElement} config.svgCanvas - SVG element for rendering virtual objects
      * @param {Function} [config.onVirtualPolygonClick] - Callback for virtual polygon clicks
      * @param {boolean} [config.virtualPolygonsClickable=true] - Whether virtual polygons should be clickable
+     * @param {number} [config.recursiveReflectionDepth=3] - Number of recursive reflection layers to create
      */
-    constructor({ svgCanvas, onVirtualPolygonClick = null, virtualPolygonsClickable = true }) {
+    constructor({ 
+        svgCanvas, 
+        onVirtualPolygonClick = null, 
+        virtualPolygonsClickable = true,
+        recursiveReflectionDepth = 3
+    }) {
         this.virtualPolygons = [];
         this.virtualViewers = [];
         this.virtualMirrors = [];
+        this.recursiveReflectionDepth = recursiveReflectionDepth;
 
         this.svgCanvas = svgCanvas;
 
@@ -209,9 +217,9 @@ export class ReflectionEngine {
             return layerNodes;
         }
 
-        // Process 3 levels of reflections (layers 1, 2, 3)
+        // Process configured number of reflection levels
         // Layer 0 is the root and doesn't create reflections
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < this.recursiveReflectionDepth; i++) {
             const layerNodes = getLayerNodes({ tree: this.reflectionTree, layer: i + 1 });
             
             // For each node at this layer, create reflections using its parent mirror
