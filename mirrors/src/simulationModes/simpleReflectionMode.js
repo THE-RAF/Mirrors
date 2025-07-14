@@ -173,7 +173,7 @@ export class SimpleReflectionMode {
                 y1: mirrorConfig.y1,
                 x2: mirrorConfig.x2,
                 y2: mirrorConfig.y2,
-                parentSvg: this.middleLayer,
+                parentSvg: this.foregroundLayer,
                 draggable: this.modeConfig.interaction?.draggableMirrors ?? true
             })
         );
