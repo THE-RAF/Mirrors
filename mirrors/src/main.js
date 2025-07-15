@@ -4,7 +4,7 @@
  */
 
 import { generalConfig } from './config/generalConfig.js';
-import { modeConfigs } from './config/modeConfigs.js';
+import { modeConfig } from './config/modeConfig.js';
 import { loadSceneAndCreateSimulation } from './utils/simpleLoader.js';
 
 // Setup canvas
@@ -14,7 +14,7 @@ svgCanvas.setAttribute('height', generalConfig.canvas.height);
 
 const simulation = loadSceneAndCreateSimulation({ 
     sceneName: generalConfig.currentExample, 
-    modeConfigs, 
+    modeConfigs: modeConfig, 
     svgCanvas 
 });
 

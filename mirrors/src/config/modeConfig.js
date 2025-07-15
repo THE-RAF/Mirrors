@@ -3,7 +3,7 @@
  * Defines HOW each mode behaves (interaction, reflection settings, etc.)
  */
 
-export const modeConfigs = {
+export const modeConfig = {
     'generalReflections': {
         interaction: {
             draggablePolygons: true,
