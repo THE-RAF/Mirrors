@@ -3,7 +3,7 @@
  * Main exports: loadSceneAndCreateSimulation
  */
 
-import { SimpleReflectionMode } from '../core/simulationModes/simpleReflectionMode.js';
+import { GeneralReflectionMode } from '../core/simulationModes/generalReflectionMode.js';
 
 // Scene imports
 import { basicReflection } from '../config/scenes/basicReflection.js';
@@ -24,7 +24,7 @@ const scenes = {
  * @param {string} config.sceneName - Scene identifier like 'basic-reflection'
  * @param {Object} config.modeConfigs - Mode configurations object
  * @param {SVGElement} config.svgCanvas - SVG canvas element for rendering
- * @returns {SimpleReflectionMode|InfiniteReflectionMode} Configured simulation instance
+ * @returns {GeneralReflectionMode|InfiniteReflectionMode} Configured simulation instance
  */
 export function loadSceneAndCreateSimulation({ sceneName, modeConfigs, svgCanvas }) {
     // Get scene
@@ -39,7 +39,7 @@ export function loadSceneAndCreateSimulation({ sceneName, modeConfigs, svgCanvas
         throw new Error(`Mode "${scene.mode}" not configured`);
     }
 
-    let simulation = new SimpleReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });
+    let simulation = new GeneralReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });
 
     return simulation;
 }

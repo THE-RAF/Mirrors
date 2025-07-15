@@ -6,7 +6,7 @@
 import { createStar, createDiamond, createPentagon } from '../../utils/geometryFactory.js';
 
 export const diagonalReflection = {
-    mode: 'simpleReflections',
+    mode: 'generalReflections',
     objects: [
         {
             // Star shape - positioned in upper left

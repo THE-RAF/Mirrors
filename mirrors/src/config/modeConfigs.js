@@ -4,7 +4,7 @@
  */
 
 export const modeConfigs = {
-    'simpleReflections': {
+    'generalReflections': {
         interaction: {
             draggablePolygons: true,
             draggableMirrors: true,

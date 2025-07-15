@@ -6,7 +6,7 @@
 import { createTriangle, createSquare } from '../../utils/geometryFactory.js';
 
 export const mirrorBox = {
-    mode: 'simpleReflections',
+    mode: 'generalReflections',
     objects: [
         {
             // Triangle

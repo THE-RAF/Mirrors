@@ -4,7 +4,7 @@
  */
 
 export const basicReflection = {
-    mode: 'simpleReflections',
+    mode: 'generalReflections',
     objects: [
         {
             // Triangle

@@ -6,7 +6,7 @@
 import { createStar, createHeart, createDiamond } from '../../utils/geometryFactory.js';
 
 export const triangularBox = {
-    mode: 'simpleReflections',
+    mode: 'generalReflections',
     objects: [
         {
             // Star shape - positioned in center

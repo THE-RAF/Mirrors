@@ -32,8 +32,8 @@ Scene-mode separation with embedded compatibility:
 ### **Simulation Modes** (`src/simulationModes/`)
 High-level orchestration using core components:
 
-- **`SimpleReflectionMode`** - Basic reflections with light beam projection. Reflects everything but mirrors. Supports any degree mirror angles
-- **`InfiniteReflectionMode`** - The same as SimpleReflectionMode, but with recursive reflections (mirrors reflect other mirrors)
+- **`GeneralReflectionMode`** - Basic reflections with light beam projection. Reflects everything but mirrors. Supports any degree mirror angles
+- **`InfiniteReflectionMode`** - The same as GeneralReflectionMode, but with recursive reflections (mirrors reflect other mirrors)
 
 ### **Supporting Systems**
 - **`math/`** - `analyticalGeometry.js`, `linearAlgebra.js` for geometric calculations

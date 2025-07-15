@@ -1,6 +1,6 @@
 /**
- * @file simpleReflectionMode.js - Simple reflection mode simulation
- * Main exports: SimpleReflectionMode
+ * @file generalReflectionMode.js - General reflection mode simulation
+ * Main exports: GeneralReflectionMode
  */
 
 import { Polygon } from '../basicEntities/real/Polygon.js';
@@ -29,12 +29,12 @@ const DEFAULT_VALUES = {
 };
 
 /**
- * @class SimpleReflectionMode
- * Simple simulation engine for basic mirror reflections with polygons and viewers
+ * @class GeneralReflectionMode
+ * General simulation engine for basic mirror reflections with polygons and viewers
  * Uses only the standard ReflectionEngine for reliable, fast reflections
  * Does not support virtual mirrors or infinite reflections
  */
-export class SimpleReflectionMode {
+export class GeneralReflectionMode {
     /**
      * @param {Object} config
      * @param {Object} config.sceneEntities - Scene configuration containing objects
@@ -83,7 +83,7 @@ export class SimpleReflectionMode {
             this.initializeSystems();
             this.setupSceneUpdates();
         } catch (error) {
-            console.error('Failed to initialize SimpleReflectionMode:', error);
+            console.error('Failed to initialize GeneralReflectionMode:', error);
             throw error;
         }
     }
@@ -291,7 +291,7 @@ export class SimpleReflectionMode {
             this.destroySVGLayers();
             this.clearEntityArrays();
         } catch (error) {
-            console.error('Error during SimpleReflectionMode destruction:', error);
+            console.error('Error during GeneralReflectionMode destruction:', error);
         }
     }
 
