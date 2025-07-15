@@ -39,10 +39,7 @@ export function loadSceneAndCreateSimulation({ sceneName, modeConfigs, svgCanvas
         throw new Error(`Mode "${scene.mode}" not configured`);
     }
 
-    // Create appropriate simulation based on mode
-    let simulation;
-    
-    simulation = new SimpleReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });
+    let simulation = new SimpleReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });
 
     return simulation;
 }

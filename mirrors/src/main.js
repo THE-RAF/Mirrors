@@ -12,7 +12,6 @@ const svgCanvas = document.getElementById('mirror-canvas');
 svgCanvas.setAttribute('width', generalConfig.canvas.width);
 svgCanvas.setAttribute('height', generalConfig.canvas.height);
 
-// Load scene and create simulation with ultra-simple loader
 const simulation = loadSceneAndCreateSimulation({ 
     sceneName: generalConfig.currentExample, 
     modeConfigs, 
