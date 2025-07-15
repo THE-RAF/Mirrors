@@ -23,13 +23,30 @@ function initializeApp() {
     // Update page title
     updatePageTitle(currentExample);
     
-    // Add navigation to the page
-    addNavigationToPage(currentExample);
+    // Add navigation to the page (only once)
+    if (!document.querySelector('.gallery-sidebar')) {
+        addNavigationToPage(currentExample);
+    } else {
+        updateNavigationContent(currentExample);
+    }
     
-    // Setup canvas
-    const svgCanvas = document.getElementById('mirror-canvas');
-    svgCanvas.setAttribute('width', generalConfig.canvas.width);
-    svgCanvas.setAttribute('height', generalConfig.canvas.height);
+    // Setup canvas (preserve existing canvas)
+    let svgCanvas = document.getElementById('mirror-canvas');
+    if (!svgCanvas) {
+        svgCanvas = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svgCanvas.id = 'mirror-canvas';
+        svgCanvas.setAttribute('width', generalConfig.canvas.width);
+        svgCanvas.setAttribute('height', generalConfig.canvas.height);
+        svgCanvas.setAttribute('viewBox', `0 0 ${generalConfig.canvas.width} ${generalConfig.canvas.height}`);
+        
+        const canvasContainer = document.querySelector('.canvas-container');
+        if (canvasContainer) {
+            canvasContainer.appendChild(svgCanvas);
+        }
+    } else {
+        // Clear existing content but keep the canvas element
+        svgCanvas.innerHTML = '';
+    }
 
     // Load and initialize simulation with selected example
     const simulation = loadSceneAndCreateSimulation({ 
@@ -59,6 +76,7 @@ function addNavigationToPage(currentExample) {
     
     // Create sidebar
     const sidebar = document.createElement('div');
+    sidebar.className = 'gallery-sidebar';
     sidebar.style.cssText = `
         width: 240px;
         background: white;
@@ -68,6 +86,42 @@ function addNavigationToPage(currentExample) {
         overflow: hidden;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     `;
+    
+    // Create canvas container with fixed dimensions
+    const canvasContainer = document.createElement('div');
+    canvasContainer.className = 'canvas-container';
+    canvasContainer.style.cssText = `
+        width: 800px;
+        height: 800px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1px solid #e1e5e9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    `;
+    
+    // Update sidebar content
+    updateSidebarContent(sidebar, currentExample);
+    
+    // Assemble main container
+    mainContainer.appendChild(sidebar);
+    mainContainer.appendChild(canvasContainer);
+    
+    // Replace the app content
+    app.innerHTML = '';
+    app.appendChild(mainContainer);
+}
+
+/**
+ * Updates sidebar content without recreating the entire layout
+ * @param {HTMLElement} sidebar - Sidebar element
+ * @param {string} currentExample - Current example name
+ */
+function updateSidebarContent(sidebar, currentExample) {
+    const info = getExampleInfo(currentExample);
     
     // Sidebar header
     const sidebarHeader = document.createElement('div');
@@ -115,21 +169,22 @@ function addNavigationToPage(currentExample) {
         ${createExampleNavigation()}
     `;
     
-    // Assemble sidebar
+    // Clear and rebuild sidebar
+    sidebar.innerHTML = '';
     sidebar.appendChild(sidebarHeader);
     sidebar.appendChild(currentSection);
     sidebar.appendChild(navSection);
-    
-    // Get the canvas
-    const canvas = document.getElementById('mirror-canvas');
-    
-    // Assemble main container
-    mainContainer.appendChild(sidebar);
-    mainContainer.appendChild(canvas);
-    
-    // Replace the app content
-    app.innerHTML = '';
-    app.appendChild(mainContainer);
+}
+
+/**
+ * Updates navigation content when example changes
+ * @param {string} currentExample - Current example name
+ */
+function updateNavigationContent(currentExample) {
+    const sidebar = document.querySelector('.gallery-sidebar');
+    if (sidebar) {
+        updateSidebarContent(sidebar, currentExample);
+    }
 }
 
 // Initialize when DOM is ready
