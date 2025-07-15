@@ -2,6 +2,12 @@
 
 An interactive visualization tool for exploring light reflection and mirror physics.
 
+
+
+https://github.com/user-attachments/assets/22d14cbf-fa3b-4ac8-81bb-0433fd6c46f5
+
+
+
 ## 🚀 Live Examples
 
 **Public Examples Gallery:** [gallery.html](https://the-raf.github.io/Mirrors/gallery.html)
