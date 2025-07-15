@@ -4,7 +4,6 @@
  */
 
 import { SimpleReflectionMode } from '../simulationModes/simpleReflectionMode.js';
-import { InfiniteReflectionMode } from '../simulationModes/infiniteReflectionMode.js';
 
 // Scene imports
 import { basicReflection } from '../config/scenes/basicReflection.js';
@@ -43,11 +42,7 @@ export function loadSceneAndCreateSimulation({ sceneName, modeConfigs, svgCanvas
     // Create appropriate simulation based on mode
     let simulation;
     
-    if (modeConfig.infiniteReflections?.enabled) {
-        simulation = new InfiniteReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });
-    } else {
-        simulation = new SimpleReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });
-    }
+    simulation = new SimpleReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });
 
     return simulation;
 }
