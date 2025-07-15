@@ -5,23 +5,18 @@
 
 import { SimpleReflectionMode } from '../simulationModes/simpleReflectionMode.js';
 import { InfiniteReflectionMode } from '../simulationModes/infiniteReflectionMode.js';
-import { SquareMirrorBoxMode } from '../simulationModes/squareMirrorBoxMode.js';
 
 // Scene imports
 import { basicReflection } from '../config/scenes/basicReflection.js';
 import { diagonalReflection } from '../config/scenes/diagonalReflection.js';
 import { mirrorBox } from '../config/scenes/mirrorBox.js';
 import { triangularBox } from '../config/scenes/triangularBox.js';
-import { infiniteBox } from '../config/scenes/infiniteBox.js';
-import { tiledSquareMirrorBox } from '../config/scenes/tiledSquareMirrorBox.js';
 
 const scenes = {
     'basic-reflection': basicReflection,
     'diagonal-reflection': diagonalReflection,
     'mirror-box': mirrorBox,
-    'triangular-box': triangularBox,
-    'infinite-box': infiniteBox,
-    'tiled-square-mirror-box': tiledSquareMirrorBox
+    'triangular-box': triangularBox
 };
 
 /**
@@ -48,9 +43,7 @@ export function loadSceneAndCreateSimulation({ sceneName, modeConfigs, svgCanvas
     // Create appropriate simulation based on mode
     let simulation;
     
-    if (scene.mode === 'squareMirrorBox') {
-        simulation = new SquareMirrorBoxMode({ sceneEntities: scene, modeConfig, svgCanvas });
-    } else if (modeConfig.infiniteReflections?.enabled) {
+    if (modeConfig.infiniteReflections?.enabled) {
         simulation = new InfiniteReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });
     } else {
         simulation = new SimpleReflectionMode({ sceneEntities: scene, modeConfig, svgCanvas });

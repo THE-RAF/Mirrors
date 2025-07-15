@@ -12,7 +12,7 @@ export const modeConfigs = {
         },
         reflections: {
             enabled: true,
-            recursiveReflectionDepth: 2
+            recursiveReflectionDepth: 4
         },
         lightBeamProjector: {
             enabled: true,
@@ -62,17 +62,6 @@ export const modeConfigs = {
                     animationDuration: 1000
                 }
             }
-        }
-    },
-
-    'squareMirrorBox': {
-        interaction: {
-            draggableObjects: true,  // Objects inside the central box
-            draggableMirrors: false, // Box structure is fixed
-            draggableViewers: true   // Viewers inside the box
-        },
-        lightBeamProjector: {
-            enabled: false          // Simplified mode without light beams
         }
     }
 };

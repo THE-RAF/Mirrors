@@ -160,6 +160,8 @@ export class ReflectionEngine {
 
         // Create virtual mirrors for each mirror-mirror combination
         currentMirrors.forEach(mirrorToReflect => {
+            if (mirrorToReflect === mirror) return; // Skip self-reflection
+            
             const virtualMirror = this.objectManager.createVirtualMirror({ 
                 mirror: mirrorToReflect, 
                 reflectionMirror: mirror 
