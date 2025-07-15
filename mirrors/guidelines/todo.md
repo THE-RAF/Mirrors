@@ -1,7 +1,0 @@
-- Solve error when user clicks in another virtual polygon when casting beams before letting the last beam finish its animation
-- make the mirrors unidirectional (one face does not reflect)
-- make recursive reflections (virtual mirrors)
-- rename geometry.js to geometryFactory.js
-- put toggle for LightBeamProjector in the config file
-- remove unused event system in LightBeamProjector
-- rename object to polygons in config
